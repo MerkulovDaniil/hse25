@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://hse25.fmin.xyz/files/mds.html</loc>
-    <lastmod>2025-01-12T10:41:27.220Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/program.html</loc>
-    <lastmod>2025-01-12T10:41:27.339Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/index.html</loc>
-    <lastmod>2025-01-12T10:41:27.331Z</lastmod>
+    <loc>https://hse25.fmin.xyz/files/nanogpt.html</loc>
+    <lastmod>2025-01-12T12:59:01.515Z</lastmod>
   </url>
   <url>
     <loc>https://hse25.fmin.xyz/homework.html</loc>
-    <lastmod>2025-01-12T10:41:27.331Z</lastmod>
+    <lastmod>2025-01-12T12:59:01.607Z</lastmod>
   </url>
   <url>
-    <loc>https://hse25.fmin.xyz/files/nanogpt.html</loc>
-    <lastmod>2025-01-12T10:41:27.240Z</lastmod>
+    <loc>https://hse25.fmin.xyz/index.html</loc>
+    <lastmod>2025-01-12T12:59:01.607Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/program.html</loc>
+    <lastmod>2025-01-12T12:59:01.615Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/files/mds.html</loc>
+    <lastmod>2025-01-12T12:59:01.496Z</lastmod>
   </url>
 </urlset>
