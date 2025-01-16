@@ -162,151 +162,144 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div id="cell-2" class="cell" data-outputid="3fb0fab6-c054-490f-935a-adb90f0dad50" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># !pip install -q transformers datasets peft accelerate bitsandbytes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q transformers datasets peft accelerate bitsandbytes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="train" class="level2">
 <h2 class="anchored" data-anchor-id="train">Train</h2>
-<div id="cell-4" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"CUDA_DEVICE_ORDER"</span>]<span class="op">=</span><span class="st">'PCI_BUS_ID'</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"XLA_PYTHON_CLIENT_PREALLOCATE"</span>] <span class="op">=</span> <span class="st">'false'</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> <span class="dv">6</span> <span class="co"># device number to use</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"CUDA_VISIBLE_DEVICES"</span>] <span class="op">=</span> <span class="ss">f'</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="cell-5" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingArguments</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig, get_peft_model, PeftModelForCausalLM</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> BitsAndBytesConfig</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> copy <span class="im">import</span> deepcopy</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>torch.random.manual_seed(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-4" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingArguments</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig, get_peft_model, PeftModelForCausalLM</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> BitsAndBytesConfig</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> copy <span class="im">import</span> deepcopy</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>torch.random.manual_seed(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>&lt;torch._C.Generator at 0x7fe5ae6cc250&gt;</code></pre>
 </div>
 </div>
-<div id="cell-6" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the Trump Tweets dataset</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> load_dataset(<span class="st">"yunfan-y/trump-tweets-cleaned"</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the tokenizer and the base model</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> <span class="st">"unsloth/Llama-3.2-3B"</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForCausalLM.from_pretrained(</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    model_name,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    device_map<span class="op">=</span><span class="st">"auto"</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    quantization_config<span class="op">=</span>BitsAndBytesConfig(load_in_8bit<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-5" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the Trump Tweets dataset</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> load_dataset(<span class="st">"yunfan-y/trump-tweets-cleaned"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the tokenizer and the base model</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> <span class="st">"unsloth/Llama-3.2-3B"</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForCausalLM.from_pretrained(</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    model_name,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    device_map<span class="op">=</span><span class="st">"auto"</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    quantization_config<span class="op">=</span>BitsAndBytesConfig(load_in_8bit<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-7" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a function for generating text</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> generate_example(prompt, model, tokenizer, max_length<span class="op">=</span><span class="dv">50</span>):</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">eval</span>()  <span class="co"># Убедитесь, что модель в режиме генерации</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> tokenizer(prompt, return_tensors<span class="op">=</span><span class="st">"pt"</span>, padding<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    input_ids <span class="op">=</span> inputs.input_ids.to(model.device)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    attention_mask <span class="op">=</span> inputs.attention_mask.to(model.device)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    output <span class="op">=</span> model.generate(</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        input_ids<span class="op">=</span>input_ids,</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        attention_mask<span class="op">=</span>attention_mask,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        max_length<span class="op">=</span>max_length,</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        num_return_sequences<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        do_sample<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        temperature<span class="op">=</span><span class="fl">0.8</span>,</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        top_p<span class="op">=</span><span class="fl">0.95</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tokenizer.decode(output[<span class="dv">0</span>], skip_special_tokens<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clean_tweet(tweet):</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove URLs</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    tweet <span class="op">=</span> re.sub(<span class="vs">r'http\S+|www\S+|https\S+'</span>, <span class="st">''</span>, tweet, flags<span class="op">=</span>re.MULTILINE)</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove retweets</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    tweet <span class="op">=</span> re.sub(<span class="vs">r'^RT\s+'</span>, <span class="st">''</span>, tweet)</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove user @ references and '#' from hashtags</span></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    tweet <span class="op">=</span> re.sub(<span class="vs">r'\@\w+|\#'</span>, <span class="st">''</span>, tweet)</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove special characters and numbers</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># tweet = re.sub(r'[^A-Za-z\d\s]', '', tweet)</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert to lowercase</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tweet.strip()</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Preprocessing the data</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> preprocess_function(examples):</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    tweets <span class="op">=</span> examples[<span class="st">"text"</span>]  <span class="co"># Use "text" instead of "content"</span></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> [<span class="ss">f"You are Donald Trump writing a tweet about politics. Your tweet: </span><span class="sc">{</span>clean_tweet(tweet)<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> tweet <span class="kw">in</span> tweets]</span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    model_inputs <span class="op">=</span> tokenizer(inputs, max_length<span class="op">=</span><span class="dv">512</span>, truncation<span class="op">=</span><span class="va">True</span>, padding<span class="op">=</span><span class="st">"max_length"</span>)</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    model_inputs[<span class="st">"labels"</span>] <span class="op">=</span> model_inputs[<span class="st">"input_ids"</span>].copy()</span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> model_inputs</span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>tokenizer.pad_token <span class="op">=</span> tokenizer.eos_token</span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>tokenized_datasets <span class="op">=</span> dataset.<span class="bu">map</span>(preprocess_function, batched<span class="op">=</span><span class="va">True</span>, remove_columns<span class="op">=</span>[<span class="st">"text"</span>])</span>
+<div id="cell-6" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a function for generating text</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> generate_example(prompt, model, tokenizer, max_length<span class="op">=</span><span class="dv">50</span>):</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">eval</span>()  <span class="co"># Убедитесь, что модель в режиме генерации</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> tokenizer(prompt, return_tensors<span class="op">=</span><span class="st">"pt"</span>, padding<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    input_ids <span class="op">=</span> inputs.input_ids.to(model.device)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    attention_mask <span class="op">=</span> inputs.attention_mask.to(model.device)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    output <span class="op">=</span> model.generate(</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        input_ids<span class="op">=</span>input_ids,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        attention_mask<span class="op">=</span>attention_mask,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        max_length<span class="op">=</span>max_length,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        num_return_sequences<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        do_sample<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        temperature<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        top_p<span class="op">=</span><span class="fl">0.95</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tokenizer.decode(output[<span class="dv">0</span>], skip_special_tokens<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clean_tweet(tweet):</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove URLs</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    tweet <span class="op">=</span> re.sub(<span class="vs">r'http\S+|www\S+|https\S+'</span>, <span class="st">''</span>, tweet, flags<span class="op">=</span>re.MULTILINE)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove retweets</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    tweet <span class="op">=</span> re.sub(<span class="vs">r'^RT\s+'</span>, <span class="st">''</span>, tweet)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove user @ references and '#' from hashtags</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    tweet <span class="op">=</span> re.sub(<span class="vs">r'\@\w+|\#'</span>, <span class="st">''</span>, tweet)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove special characters and numbers</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># tweet = re.sub(r'[^A-Za-z\d\s]', '', tweet)</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert to lowercase</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tweet.strip()</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Preprocessing the data</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> preprocess_function(examples):</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    tweets <span class="op">=</span> examples[<span class="st">"text"</span>]  <span class="co"># Use "text" instead of "content"</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> [<span class="ss">f"You are Donald Trump writing a tweet about politics. Your tweet: </span><span class="sc">{</span>clean_tweet(tweet)<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> tweet <span class="kw">in</span> tweets]</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    model_inputs <span class="op">=</span> tokenizer(inputs, max_length<span class="op">=</span><span class="dv">512</span>, truncation<span class="op">=</span><span class="va">True</span>, padding<span class="op">=</span><span class="st">"max_length"</span>)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    model_inputs[<span class="st">"labels"</span>] <span class="op">=</span> model_inputs[<span class="st">"input_ids"</span>].copy()</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> model_inputs</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>tokenizer.pad_token <span class="op">=</span> tokenizer.eos_token</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>tokenized_datasets <span class="op">=</span> dataset.<span class="bu">map</span>(preprocess_function, batched<span class="op">=</span><span class="va">True</span>, remove_columns<span class="op">=</span>[<span class="st">"text"</span>])</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Split the dataset into training and validation sets</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>train_test_split <span class="op">=</span> tokenized_datasets[<span class="st">"train"</span>].train_test_split(test_size<span class="op">=</span><span class="fl">0.01</span>, seed<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>train_dataset <span class="op">=</span> train_test_split[<span class="st">"train"</span>]</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>eval_dataset <span class="op">=</span> train_test_split[<span class="st">"test"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-7" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate text before training</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Text Generation Before Training ==="</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> <span class="st">"Immigrants"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(generate_example(prompt, model, tokenizer))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare LoRA configuration</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>lora_config <span class="op">=</span> LoraConfig(</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    r<span class="op">=</span><span class="dv">64</span>,  <span class="co"># Rank of the LoRA update matrices</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    lora_alpha<span class="op">=</span><span class="dv">32</span>,  <span class="co"># LoRA scaling factor</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    target_modules<span class="op">=</span>[<span class="st">"q_proj"</span>, <span class="st">"v_proj"</span>],  <span class="co"># Modules to apply LoRA</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    lora_dropout<span class="op">=</span><span class="fl">0.1</span>,  <span class="co"># Dropout rate for LoRA</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    bias<span class="op">=</span><span class="st">"none"</span>,  <span class="co"># Do not train biases</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    task_type<span class="op">=</span><span class="st">"CAUSAL_LM"</span>  <span class="co"># Task type for causal language modeling</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Wrap the model with PEFT</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>peft_model <span class="op">=</span> get_peft_model(model, lora_config)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">"./trump_lora"</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Define training arguments</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>training_args <span class="op">=</span> TrainingArguments(</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    output_dir<span class="op">=</span>output_dir,  <span class="co"># Directory for saving the model</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    eval_strategy<span class="op">=</span><span class="st">"steps"</span>,  <span class="co"># No evaluation dataset</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    logging_steps<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    save_strategy<span class="op">=</span><span class="st">"steps"</span>,</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    save_steps<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    learning_rate<span class="op">=</span><span class="fl">3e-4</span>,</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    per_device_train_batch_size<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    per_device_eval_batch_size<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    num_train_epochs<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    max_steps<span class="op">=</span><span class="dv">100</span>,</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    weight_decay<span class="op">=</span><span class="fl">0.01</span>,</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    gradient_accumulation_steps<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    warmup_steps<span class="op">=</span><span class="dv">100</span>,</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    logging_dir<span class="op">=</span><span class="st">"./logs"</span>,</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    fp16<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    report_to<span class="op">=</span><span class="st">'none'</span>,</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Split the dataset into training and validation sets</span></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>train_test_split <span class="op">=</span> tokenized_datasets[<span class="st">"train"</span>].train_test_split(test_size<span class="op">=</span><span class="fl">0.01</span>, seed<span class="op">=</span><span class="dv">42</span>)</span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>train_dataset <span class="op">=</span> train_test_split[<span class="st">"train"</span>]</span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>eval_dataset <span class="op">=</span> train_test_split[<span class="st">"test"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="cell-8" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate text before training</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Text Generation Before Training ==="</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> <span class="st">"Immigrants"</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(generate_example(prompt, model, tokenizer))</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare LoRA configuration</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>lora_config <span class="op">=</span> LoraConfig(</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    r<span class="op">=</span><span class="dv">64</span>,  <span class="co"># Rank of the LoRA update matrices</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    lora_alpha<span class="op">=</span><span class="dv">32</span>,  <span class="co"># LoRA scaling factor</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    target_modules<span class="op">=</span>[<span class="st">"q_proj"</span>, <span class="st">"v_proj"</span>],  <span class="co"># Modules to apply LoRA</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    lora_dropout<span class="op">=</span><span class="fl">0.1</span>,  <span class="co"># Dropout rate for LoRA</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    bias<span class="op">=</span><span class="st">"none"</span>,  <span class="co"># Do not train biases</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    task_type<span class="op">=</span><span class="st">"CAUSAL_LM"</span>  <span class="co"># Task type for causal language modeling</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Wrap the model with PEFT</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>peft_model <span class="op">=</span> get_peft_model(model, lora_config)</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">"./trump_lora"</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Define training arguments</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>training_args <span class="op">=</span> TrainingArguments(</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    output_dir<span class="op">=</span>output_dir,  <span class="co"># Directory for saving the model</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    eval_strategy<span class="op">=</span><span class="st">"steps"</span>,  <span class="co"># No evaluation dataset</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    logging_steps<span class="op">=</span><span class="dv">10</span>,</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    save_strategy<span class="op">=</span><span class="st">"steps"</span>,</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    save_steps<span class="op">=</span><span class="dv">10</span>,</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    learning_rate<span class="op">=</span><span class="fl">3e-4</span>,</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    per_device_train_batch_size<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    per_device_eval_batch_size<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    num_train_epochs<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    max_steps<span class="op">=</span><span class="dv">100</span>,</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    weight_decay<span class="op">=</span><span class="fl">0.01</span>,</span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    gradient_accumulation_steps<span class="op">=</span><span class="dv">16</span>,</span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    warmup_steps<span class="op">=</span><span class="dv">100</span>,</span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    logging_dir<span class="op">=</span><span class="st">"./logs"</span>,</span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    fp16<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>    report_to<span class="op">=</span><span class="st">'none'</span>,</span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the Trainer with eval_dataset</span></span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> Trainer(</span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>peft_model,</span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>    args<span class="op">=</span>training_args,</span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    train_dataset<span class="op">=</span>train_dataset,</span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    eval_dataset<span class="op">=</span>eval_dataset,</span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the model</span></span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>trainer.train()</span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the fine-tuned model</span></span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>peft_model.save_pretrained(output_dir)</span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>tokenizer.save_pretrained(output_dir)</span>
-<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate text after training</span></span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Text Generation After Training ==="</span>)</span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(generate_example(prompt, peft_model, tokenizer))</span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Model fine-tuned and saved!"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the Trainer with eval_dataset</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> Trainer(</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>peft_model,</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    args<span class="op">=</span>training_args,</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    train_dataset<span class="op">=</span>train_dataset,</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>    eval_dataset<span class="op">=</span>eval_dataset,</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the model</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>trainer.train()</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the fine-tuned model</span></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>peft_model.save_pretrained(output_dir)</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>tokenizer.save_pretrained(output_dir)</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate text after training</span></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Text Generation After Training ==="</span>)</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(generate_example(prompt, peft_model, tokenizer))</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Model fine-tuned and saved!"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.</code></pre>
 </div>
@@ -401,132 +394,132 @@ Model fine-tuned and saved!</code></pre>
 <section id="inference" class="level2">
 <h2 class="anchored" data-anchor-id="inference">Inference</h2>
 <p>Seems like when we load fine-tuned model, it overwrites original model, so restart notebook just in case before inference</p>
-<div id="cell-11" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"CUDA_DEVICE_ORDER"</span>]<span class="op">=</span><span class="st">'PCI_BUS_ID'</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"XLA_PYTHON_CLIENT_PREALLOCATE"</span>] <span class="op">=</span> <span class="st">'false'</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> <span class="dv">6</span> <span class="co"># device number to use</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"CUDA_VISIBLE_DEVICES"</span>] <span class="op">=</span> <span class="ss">f'</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-10" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"CUDA_DEVICE_ORDER"</span>]<span class="op">=</span><span class="st">'PCI_BUS_ID'</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"XLA_PYTHON_CLIENT_PREALLOCATE"</span>] <span class="op">=</span> <span class="st">'false'</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> <span class="dv">6</span> <span class="co"># device number to use</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"CUDA_VISIBLE_DEVICES"</span>] <span class="op">=</span> <span class="ss">f'</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-12" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingArguments</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig, get_peft_model, PeftModelForCausalLM</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> BitsAndBytesConfig</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> copy <span class="im">import</span> deepcopy</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>torch.random.manual_seed(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-11" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingArguments</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig, get_peft_model, PeftModelForCausalLM</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> BitsAndBytesConfig</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> copy <span class="im">import</span> deepcopy</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>torch.random.manual_seed(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>&lt;torch._C.Generator at 0x7f4c68630310&gt;</code></pre>
 </div>
 </div>
-<div id="cell-13" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the Trump Tweets dataset</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> load_dataset(<span class="st">"yunfan-y/trump-tweets-cleaned"</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the tokenizer and the base model</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> <span class="st">"unsloth/Llama-3.2-3B"</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name)</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForCausalLM.from_pretrained(</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    model_name,</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    device_map<span class="op">=</span><span class="st">"auto"</span>,</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    quantization_config<span class="op">=</span>BitsAndBytesConfig(load_in_8bit<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-12" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the Trump Tweets dataset</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> load_dataset(<span class="st">"yunfan-y/trump-tweets-cleaned"</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the tokenizer and the base model</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> <span class="st">"unsloth/Llama-3.2-3B"</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForCausalLM.from_pretrained(</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    model_name,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    device_map<span class="op">=</span><span class="st">"auto"</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    quantization_config<span class="op">=</span>BitsAndBytesConfig(load_in_8bit<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-14" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a function for generating text</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> generate_example(prompt, model, tokenizer, max_length<span class="op">=</span><span class="dv">50</span>):</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">eval</span>()  <span class="co"># Убедитесь, что модель в режиме генерации</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> tokenizer(prompt, return_tensors<span class="op">=</span><span class="st">"pt"</span>, padding<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    input_ids <span class="op">=</span> inputs.input_ids.to(model.device)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    attention_mask <span class="op">=</span> inputs.attention_mask.to(model.device)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    output <span class="op">=</span> model.generate(</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>        input_ids<span class="op">=</span>input_ids,</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>        attention_mask<span class="op">=</span>attention_mask,</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        max_length<span class="op">=</span>max_length,</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>        num_return_sequences<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>        do_sample<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>        temperature<span class="op">=</span><span class="fl">0.8</span>,</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>        top_p<span class="op">=</span><span class="fl">0.95</span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tokenizer.decode(output[<span class="dv">0</span>], skip_special_tokens<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clean_tweet(tweet):</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove URLs</span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    tweet <span class="op">=</span> re.sub(<span class="vs">r'http\S+|www\S+|https\S+'</span>, <span class="st">''</span>, tweet, flags<span class="op">=</span>re.MULTILINE)</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove retweets</span></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    tweet <span class="op">=</span> re.sub(<span class="vs">r'^RT\s+'</span>, <span class="st">''</span>, tweet)</span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove user @ references and '#' from hashtags</span></span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    tweet <span class="op">=</span> re.sub(<span class="vs">r'\@\w+|\#'</span>, <span class="st">''</span>, tweet)</span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove special characters and numbers</span></span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># tweet = re.sub(r'[^A-Za-z\d\s]', '', tweet)</span></span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert to lowercase</span></span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tweet.strip()</span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Preprocessing the data</span></span>
-<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> preprocess_function(examples):</span>
-<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>    tweets <span class="op">=</span> examples[<span class="st">"text"</span>]  <span class="co"># Use "text" instead of "content"</span></span>
-<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> [<span class="ss">f"You are Donald Trump writing a tweet about politics. Your tweet: </span><span class="sc">{</span>clean_tweet(tweet)<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> tweet <span class="kw">in</span> tweets]</span>
-<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>    model_inputs <span class="op">=</span> tokenizer(inputs, max_length<span class="op">=</span><span class="dv">512</span>, truncation<span class="op">=</span><span class="va">True</span>, padding<span class="op">=</span><span class="st">"max_length"</span>)</span>
-<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>    model_inputs[<span class="st">"labels"</span>] <span class="op">=</span> model_inputs[<span class="st">"input_ids"</span>].copy()</span>
-<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> model_inputs</span>
-<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>tokenizer.pad_token <span class="op">=</span> tokenizer.eos_token</span>
-<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>tokenized_datasets <span class="op">=</span> dataset.<span class="bu">map</span>(preprocess_function, batched<span class="op">=</span><span class="va">True</span>, remove_columns<span class="op">=</span>[<span class="st">"text"</span>])</span>
-<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Split the dataset into training and validation sets</span></span>
-<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>train_test_split <span class="op">=</span> tokenized_datasets[<span class="st">"train"</span>].train_test_split(test_size<span class="op">=</span><span class="fl">0.01</span>, seed<span class="op">=</span><span class="dv">42</span>)</span>
-<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>train_dataset <span class="op">=</span> train_test_split[<span class="st">"train"</span>]</span>
-<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>eval_dataset <span class="op">=</span> train_test_split[<span class="st">"test"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-13" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a function for generating text</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> generate_example(prompt, model, tokenizer, max_length<span class="op">=</span><span class="dv">50</span>):</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    model.<span class="bu">eval</span>()  <span class="co"># Убедитесь, что модель в режиме генерации</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> tokenizer(prompt, return_tensors<span class="op">=</span><span class="st">"pt"</span>, padding<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    input_ids <span class="op">=</span> inputs.input_ids.to(model.device)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    attention_mask <span class="op">=</span> inputs.attention_mask.to(model.device)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    output <span class="op">=</span> model.generate(</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>        input_ids<span class="op">=</span>input_ids,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        attention_mask<span class="op">=</span>attention_mask,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>        max_length<span class="op">=</span>max_length,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>        num_return_sequences<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        do_sample<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        temperature<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>        top_p<span class="op">=</span><span class="fl">0.95</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tokenizer.decode(output[<span class="dv">0</span>], skip_special_tokens<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clean_tweet(tweet):</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove URLs</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    tweet <span class="op">=</span> re.sub(<span class="vs">r'http\S+|www\S+|https\S+'</span>, <span class="st">''</span>, tweet, flags<span class="op">=</span>re.MULTILINE)</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove retweets</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    tweet <span class="op">=</span> re.sub(<span class="vs">r'^RT\s+'</span>, <span class="st">''</span>, tweet)</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove user @ references and '#' from hashtags</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    tweet <span class="op">=</span> re.sub(<span class="vs">r'\@\w+|\#'</span>, <span class="st">''</span>, tweet)</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove special characters and numbers</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># tweet = re.sub(r'[^A-Za-z\d\s]', '', tweet)</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert to lowercase</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tweet.strip()</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Preprocessing the data</span></span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> preprocess_function(examples):</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>    tweets <span class="op">=</span> examples[<span class="st">"text"</span>]  <span class="co"># Use "text" instead of "content"</span></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> [<span class="ss">f"You are Donald Trump writing a tweet about politics. Your tweet: </span><span class="sc">{</span>clean_tweet(tweet)<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> tweet <span class="kw">in</span> tweets]</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>    model_inputs <span class="op">=</span> tokenizer(inputs, max_length<span class="op">=</span><span class="dv">512</span>, truncation<span class="op">=</span><span class="va">True</span>, padding<span class="op">=</span><span class="st">"max_length"</span>)</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>    model_inputs[<span class="st">"labels"</span>] <span class="op">=</span> model_inputs[<span class="st">"input_ids"</span>].copy()</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> model_inputs</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>tokenizer.pad_token <span class="op">=</span> tokenizer.eos_token</span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>tokenized_datasets <span class="op">=</span> dataset.<span class="bu">map</span>(preprocess_function, batched<span class="op">=</span><span class="va">True</span>, remove_columns<span class="op">=</span>[<span class="st">"text"</span>])</span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Split the dataset into training and validation sets</span></span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>train_test_split <span class="op">=</span> tokenized_datasets[<span class="st">"train"</span>].train_test_split(test_size<span class="op">=</span><span class="fl">0.01</span>, seed<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>train_dataset <span class="op">=</span> train_test_split[<span class="st">"train"</span>]</span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>eval_dataset <span class="op">=</span> train_test_split[<span class="st">"test"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="original-model" class="level3">
 <h3 class="anchored" data-anchor-id="original-model">Original model</h3>
-<div id="cell-16" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> DataLoader</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>train_test_split <span class="op">=</span> tokenized_datasets[<span class="st">"train"</span>].train_test_split(test_size<span class="op">=</span><span class="fl">0.01</span>, seed<span class="op">=</span><span class="dv">42</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>train_dataset <span class="op">=</span> train_test_split[<span class="st">"train"</span>]</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>eval_dataset <span class="op">=</span> train_test_split[<span class="st">"test"</span>]</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate both models on the evaluation dataset</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Comparing Model Performance on Evaluation Dataset ==="</span>)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate original model</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>model.<span class="bu">eval</span>()</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>eval_loss <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>eval_steps <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>eval_data_loader <span class="op">=</span> DataLoader(eval_dataset, batch_size<span class="op">=</span><span class="dv">4</span>, collate_fn<span class="op">=</span><span class="kw">lambda</span> x: {k: torch.tensor([d[k] <span class="cf">for</span> d <span class="kw">in</span> x]).to(model.device) <span class="cf">for</span> k <span class="kw">in</span> x[<span class="dv">0</span>].keys()})</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> batch <span class="kw">in</span> eval_data_loader:</span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>        outputs <span class="op">=</span> model(<span class="op">**</span>{k: v <span class="cf">for</span> k, v <span class="kw">in</span> batch.items() <span class="cf">if</span> k <span class="op">!=</span> <span class="st">'labels'</span>}, labels<span class="op">=</span>batch[<span class="st">'labels'</span>])</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>        eval_loss <span class="op">+=</span> outputs.loss.item()</span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>        eval_steps <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>original_perplexity <span class="op">=</span> math.exp(eval_loss <span class="op">/</span> eval_steps)</span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Original Model Perplexity: </span><span class="sc">{</span>original_perplexity<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Original Model Loss: </span><span class="sc">{</span>eval_loss<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-15" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> DataLoader</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>train_test_split <span class="op">=</span> tokenized_datasets[<span class="st">"train"</span>].train_test_split(test_size<span class="op">=</span><span class="fl">0.01</span>, seed<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>train_dataset <span class="op">=</span> train_test_split[<span class="st">"train"</span>]</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>eval_dataset <span class="op">=</span> train_test_split[<span class="st">"test"</span>]</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate both models on the evaluation dataset</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Comparing Model Performance on Evaluation Dataset ==="</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate original model</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>model.<span class="bu">eval</span>()</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>eval_loss <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>eval_steps <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>eval_data_loader <span class="op">=</span> DataLoader(eval_dataset, batch_size<span class="op">=</span><span class="dv">4</span>, collate_fn<span class="op">=</span><span class="kw">lambda</span> x: {k: torch.tensor([d[k] <span class="cf">for</span> d <span class="kw">in</span> x]).to(model.device) <span class="cf">for</span> k <span class="kw">in</span> x[<span class="dv">0</span>].keys()})</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> batch <span class="kw">in</span> eval_data_loader:</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>        outputs <span class="op">=</span> model(<span class="op">**</span>{k: v <span class="cf">for</span> k, v <span class="kw">in</span> batch.items() <span class="cf">if</span> k <span class="op">!=</span> <span class="st">'labels'</span>}, labels<span class="op">=</span>batch[<span class="st">'labels'</span>])</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>        eval_loss <span class="op">+=</span> outputs.loss.item()</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>        eval_steps <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>original_perplexity <span class="op">=</span> math.exp(eval_loss <span class="op">/</span> eval_steps)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Original Model Perplexity: </span><span class="sc">{</span>original_perplexity<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Original Model Loss: </span><span class="sc">{</span>eval_loss<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>=== Comparing Model Performance on Evaluation Dataset ===
 Original Model Perplexity: 732.55
 Original Model Loss: 554.11</code></pre>
 </div>
 </div>
-<div id="cell-17" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>test_prompts <span class="op">=</span> [</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, Donald Trump"</span>,</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, Barack Obama"</span>,</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, Joe Biden"</span>,</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, the Democrats are"</span>,</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"We need to"</span>,</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-16" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>test_prompts <span class="op">=</span> [</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, Donald Trump"</span>,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, Barack Obama"</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, Joe Biden"</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, the Democrats are"</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"We need to"</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-18" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prompt <span class="kw">in</span> test_prompts:</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(generate_example(prompt, model, tokenizer))</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"---"</span>)</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-17" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prompt <span class="kw">in</span> test_prompts:</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(generate_example(prompt, model, tokenizer))</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"---"</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.
 Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.</code></pre>
@@ -640,17 +633,17 @@ We need to look at the whole picture and get our minds around it. We need to und
 </code></pre>
 </div>
 </div>
-<div id="cell-19" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>test_prompts <span class="op">=</span> [</span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"The United States"</span>,</span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-18" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>test_prompts <span class="op">=</span> [</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"The United States"</span>,</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-20" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prompt <span class="kw">in</span> test_prompts:</span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(generate_example(prompt, model, tokenizer))</span>
-<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"---"</span>)</span>
-<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-19" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prompt <span class="kw">in</span> test_prompts:</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(generate_example(prompt, model, tokenizer))</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"---"</span>)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.
 Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.</code></pre>
@@ -720,17 +713,17 @@ The United States and the rest of the world are facing an unprecedented crisis o
 </code></pre>
 </div>
 </div>
-<div id="cell-21" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>test_prompts <span class="op">=</span> [</span>
-<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Hillary Clinton is a"</span>,</span>
-<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-20" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>test_prompts <span class="op">=</span> [</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Hillary Clinton is a"</span>,</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-22" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prompt <span class="kw">in</span> test_prompts:</span>
-<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
-<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(generate_example(prompt, model, tokenizer))</span>
-<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"---"</span>)</span>
-<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-21" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prompt <span class="kw">in</span> test_prompts:</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(generate_example(prompt, model, tokenizer))</span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"---"</span>)</span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.
 Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.</code></pre>
@@ -809,22 +802,22 @@ Hillary Clinton is a former U.S. Secretary of State and former First Lady of the
 <section id="lora-model" class="level3">
 <h3 class="anchored" data-anchor-id="lora-model">Lora model</h3>
 <p>Most of the prompts give rather the same results. Probably, I could not find any good prompts for this model. But qualitative results (loss/perplexity on evaluation dataset) speak for itself.</p>
-<div id="cell-25" class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate LORA model</span></span>
-<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">"./trump_lora"</span></span>
-<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a>peft_model <span class="op">=</span> PeftModelForCausalLM.from_pretrained(model, output_dir)</span>
-<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>peft_eval_loss <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>peft_eval_steps <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
-<span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> batch <span class="kw">in</span> eval_data_loader:</span>
-<span id="cb89-8"><a href="#cb89-8" aria-hidden="true" tabindex="-1"></a>        outputs <span class="op">=</span> peft_model(<span class="op">**</span>{k: v <span class="cf">for</span> k, v <span class="kw">in</span> batch.items() <span class="cf">if</span> k <span class="op">!=</span> <span class="st">'labels'</span>}, labels<span class="op">=</span>batch[<span class="st">'labels'</span>])</span>
-<span id="cb89-9"><a href="#cb89-9" aria-hidden="true" tabindex="-1"></a>        peft_eval_loss <span class="op">+=</span> outputs.loss.item()</span>
-<span id="cb89-10"><a href="#cb89-10" aria-hidden="true" tabindex="-1"></a>        peft_eval_steps <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb89-11"><a href="#cb89-11" aria-hidden="true" tabindex="-1"></a>peft_perplexity <span class="op">=</span> math.exp(peft_eval_loss <span class="op">/</span> peft_eval_steps)</span>
-<span id="cb89-12"><a href="#cb89-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"LORA Model Perplexity: </span><span class="sc">{</span>peft_perplexity<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb89-13"><a href="#cb89-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"LORA Model Loss: </span><span class="sc">{</span>peft_eval_loss<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb89-14"><a href="#cb89-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Perplexity Improvement: </span><span class="sc">{</span>original_perplexity <span class="op">-</span> peft_perplexity<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb89-15"><a href="#cb89-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Loss improvement: </span><span class="sc">{</span>eval_loss <span class="op">-</span> peft_eval_loss<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-24" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate LORA model</span></span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">"./trump_lora"</span></span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>peft_model <span class="op">=</span> PeftModelForCausalLM.from_pretrained(model, output_dir)</span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>peft_eval_loss <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>peft_eval_steps <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> batch <span class="kw">in</span> eval_data_loader:</span>
+<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a>        outputs <span class="op">=</span> peft_model(<span class="op">**</span>{k: v <span class="cf">for</span> k, v <span class="kw">in</span> batch.items() <span class="cf">if</span> k <span class="op">!=</span> <span class="st">'labels'</span>}, labels<span class="op">=</span>batch[<span class="st">'labels'</span>])</span>
+<span id="cb88-9"><a href="#cb88-9" aria-hidden="true" tabindex="-1"></a>        peft_eval_loss <span class="op">+=</span> outputs.loss.item()</span>
+<span id="cb88-10"><a href="#cb88-10" aria-hidden="true" tabindex="-1"></a>        peft_eval_steps <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb88-11"><a href="#cb88-11" aria-hidden="true" tabindex="-1"></a>peft_perplexity <span class="op">=</span> math.exp(peft_eval_loss <span class="op">/</span> peft_eval_steps)</span>
+<span id="cb88-12"><a href="#cb88-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"LORA Model Perplexity: </span><span class="sc">{</span>peft_perplexity<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb88-13"><a href="#cb88-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"LORA Model Loss: </span><span class="sc">{</span>peft_eval_loss<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb88-14"><a href="#cb88-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Perplexity Improvement: </span><span class="sc">{</span>original_perplexity <span class="op">-</span> peft_perplexity<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb88-15"><a href="#cb88-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Loss improvement: </span><span class="sc">{</span>eval_loss <span class="op">-</span> peft_eval_loss<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>LORA Model Perplexity: 1.18
 LORA Model Loss: 13.93
@@ -832,21 +825,21 @@ Perplexity Improvement: 731.37
 Loss improvement: 540.18</code></pre>
 </div>
 </div>
-<div id="cell-26" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>test_prompts <span class="op">=</span> [</span>
-<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, Donald Trump"</span>,</span>
-<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, Barack Obama"</span>,</span>
-<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, Joe Biden"</span>,</span>
-<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, the Democrats are"</span>,</span>
-<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"We need to"</span>,</span>
-<span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-25" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>test_prompts <span class="op">=</span> [</span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, Donald Trump"</span>,</span>
+<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, Barack Obama"</span>,</span>
+<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, Joe Biden"</span>,</span>
+<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"I think, the Democrats are"</span>,</span>
+<span id="cb90-6"><a href="#cb90-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"We need to"</span>,</span>
+<span id="cb90-7"><a href="#cb90-7" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-27" class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prompt <span class="kw">in</span> test_prompts:</span>
-<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
-<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(generate_example(prompt, peft_model, tokenizer))</span>
-<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"---"</span>)</span>
-<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-26" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prompt <span class="kw">in</span> test_prompts:</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(generate_example(prompt, peft_model, tokenizer))</span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"---"</span>)</span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.
 Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.</code></pre>
@@ -960,17 +953,17 @@ We need to protect the environment from pollution by plastic. But what about the
 </code></pre>
 </div>
 </div>
-<div id="cell-28" class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a>test_prompts <span class="op">=</span> [</span>
-<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"The United States"</span>,</span>
-<span id="cb121-3"><a href="#cb121-3" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-27" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a>test_prompts <span class="op">=</span> [</span>
+<span id="cb120-2"><a href="#cb120-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"The United States"</span>,</span>
+<span id="cb120-3"><a href="#cb120-3" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-29" class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prompt <span class="kw">in</span> test_prompts:</span>
-<span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
-<span id="cb122-3"><a href="#cb122-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(generate_example(prompt, peft_model, tokenizer))</span>
-<span id="cb122-4"><a href="#cb122-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"---"</span>)</span>
-<span id="cb122-5"><a href="#cb122-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-28" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prompt <span class="kw">in</span> test_prompts:</span>
+<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
+<span id="cb121-3"><a href="#cb121-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(generate_example(prompt, peft_model, tokenizer))</span>
+<span id="cb121-4"><a href="#cb121-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"---"</span>)</span>
+<span id="cb121-5"><a href="#cb121-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.
 Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.</code></pre>
@@ -1039,17 +1032,17 @@ The United States is home to many unique attractions, including the Statue of Li
 </code></pre>
 </div>
 </div>
-<div id="cell-30" class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb141"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a>test_prompts <span class="op">=</span> [</span>
-<span id="cb141-2"><a href="#cb141-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Hillary Clinton is a"</span>,</span>
-<span id="cb141-3"><a href="#cb141-3" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-29" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb140"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb140-1"><a href="#cb140-1" aria-hidden="true" tabindex="-1"></a>test_prompts <span class="op">=</span> [</span>
+<span id="cb140-2"><a href="#cb140-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Hillary Clinton is a"</span>,</span>
+<span id="cb140-3"><a href="#cb140-3" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-31" class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb142"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb142-1"><a href="#cb142-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prompt <span class="kw">in</span> test_prompts:</span>
-<span id="cb142-2"><a href="#cb142-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
-<span id="cb142-3"><a href="#cb142-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(generate_example(prompt, peft_model, tokenizer))</span>
-<span id="cb142-4"><a href="#cb142-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"---"</span>)</span>
-<span id="cb142-5"><a href="#cb142-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-30" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb141"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> prompt <span class="kw">in</span> test_prompts:</span>
+<span id="cb141-2"><a href="#cb141-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
+<span id="cb141-3"><a href="#cb141-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(generate_example(prompt, peft_model, tokenizer))</span>
+<span id="cb141-4"><a href="#cb141-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"---"</span>)</span>
+<span id="cb141-5"><a href="#cb141-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.
 Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.</code></pre>
