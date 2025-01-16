@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://hse25.fmin.xyz/files/nanogpt.html</loc>
-    <lastmod>2025-01-16T18:28:26.866Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/program.html</loc>
-    <lastmod>2025-01-16T18:28:27.026Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/index.html</loc>
-    <lastmod>2025-01-16T18:28:26.958Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/homework.html</loc>
-    <lastmod>2025-01-16T18:28:26.958Z</lastmod>
+    <loc>https://hse25.fmin.xyz/files/mds.html</loc>
+    <lastmod>2025-01-16T18:39:53.169Z</lastmod>
   </url>
   <url>
     <loc>https://hse25.fmin.xyz/notebooks/s1_lora_trump.html</loc>
-    <lastmod>2025-01-16T18:28:26.959Z</lastmod>
+    <lastmod>2025-01-16T18:39:53.280Z</lastmod>
   </url>
   <url>
-    <loc>https://hse25.fmin.xyz/files/mds.html</loc>
-    <lastmod>2025-01-16T18:28:26.847Z</lastmod>
+    <loc>https://hse25.fmin.xyz/homework.html</loc>
+    <lastmod>2025-01-16T18:39:53.279Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/index.html</loc>
+    <lastmod>2025-01-16T18:39:53.280Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/program.html</loc>
+    <lastmod>2025-01-16T18:39:53.349Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/files/nanogpt.html</loc>
+    <lastmod>2025-01-16T18:39:53.188Z</lastmod>
   </url>
 </urlset>
