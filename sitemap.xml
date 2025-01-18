@@ -2,26 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://hse25.fmin.xyz/files/mds.html</loc>
-    <lastmod>2025-01-17T15:32:05.415Z</lastmod>
+    <lastmod>2025-01-18T15:06:30.623Z</lastmod>
   </url>
   <url>
     <loc>https://hse25.fmin.xyz/notebooks/s1_lora_trump.html</loc>
-    <lastmod>2025-01-17T15:32:05.532Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/homework.html</loc>
-    <lastmod>2025-01-17T15:32:05.531Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/index.html</loc>
-    <lastmod>2025-01-17T15:32:05.531Z</lastmod>
+    <lastmod>2025-01-18T15:06:30.735Z</lastmod>
   </url>
   <url>
     <loc>https://hse25.fmin.xyz/program.html</loc>
-    <lastmod>2025-01-17T15:32:05.599Z</lastmod>
+    <lastmod>2025-01-18T15:06:30.804Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/index.html</loc>
+    <lastmod>2025-01-18T15:06:30.734Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/homework.html</loc>
+    <lastmod>2025-01-18T15:06:30.734Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/notebooks/s2_brent.html</loc>
+    <lastmod>2025-01-18T15:06:30.736Z</lastmod>
   </url>
   <url>
     <loc>https://hse25.fmin.xyz/files/nanogpt.html</loc>
-    <lastmod>2025-01-17T15:32:05.434Z</lastmod>
+    <lastmod>2025-01-18T15:06:30.642Z</lastmod>
   </url>
 </urlset>
