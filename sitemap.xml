@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://hse25.fmin.xyz/program.html</loc>
-    <lastmod>2025-01-31T21:14:54.630Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/notebooks/s2_brent.html</loc>
-    <lastmod>2025-01-31T21:14:54.453Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/homework.html</loc>
-    <lastmod>2025-01-31T21:14:54.452Z</lastmod>
+    <loc>https://hse25.fmin.xyz/notebooks/s1_lora_trump.html</loc>
+    <lastmod>2025-02-01T15:35:26.626Z</lastmod>
   </url>
   <url>
     <loc>https://hse25.fmin.xyz/index.html</loc>
-    <lastmod>2025-01-31T21:14:54.452Z</lastmod>
+    <lastmod>2025-02-01T15:35:26.625Z</lastmod>
   </url>
   <url>
-    <loc>https://hse25.fmin.xyz/notebooks/s1_lora_trump.html</loc>
-    <lastmod>2025-01-31T21:14:54.453Z</lastmod>
+    <loc>https://hse25.fmin.xyz/homework.html</loc>
+    <lastmod>2025-02-01T15:35:26.625Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/notebooks/s2_brent.html</loc>
+    <lastmod>2025-02-01T15:35:26.627Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/program.html</loc>
+    <lastmod>2025-02-01T15:35:26.800Z</lastmod>
   </url>
 </urlset>
