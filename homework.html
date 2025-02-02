@@ -219,15 +219,12 @@ window.Quarto = {
 <section id="linear-algebra-basics" class="level3">
 <h3 class="anchored" data-anchor-id="linear-algebra-basics">Linear algebra basics</h3>
 <ol type="1">
-<li>[6 points] <strong>Sensitivity Analysis in Linear Systems</strong> Consider a nonsingular matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span> and a vector <span class="math inline">b \in \mathbb{R}^n</span>. Suppose that due to measurement or computational errors, the vector <span class="math inline">b</span> is perturbed to <span class="math inline">\tilde{b} = b + \delta b</span>.<br>
-</li>
-</ol>
-<ol type="a">
+<li><p>[6 points] <strong>Sensitivity Analysis in Linear Systems</strong> Consider a nonsingular matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span> and a vector <span class="math inline">b \in \mathbb{R}^n</span>. Suppose that due to measurement or computational errors, the vector <span class="math inline">b</span> is perturbed to <span class="math inline">\tilde{b} = b + \delta b</span>.</p>
+<ol type="1">
 <li>Derive an upper bound for the relative error in the solution <span class="math inline">x</span> of the system <span class="math inline">Ax = b</span> in terms of the condition number <span class="math inline">\kappa(A)</span> and the relative error in <span class="math inline">b</span>.<br>
 </li>
 <li>Provide a concrete example using a <span class="math inline">2 \times 2</span> matrix where <span class="math inline">\kappa(A)</span> is large (say, <span class="math inline">\geq 100500</span>).</li>
-</ol>
-<ol type="1">
+</ol></li>
 <li><p>[10 points] <strong>Effect of Diagonal Scaling on Rank</strong> Let <span class="math inline">A \in \mathbb{R}^{n \times n}</span> be a matrix with rank <span class="math inline">r</span>. Suppose <span class="math inline">D \in \mathbb{R}^{n \times n}</span> is a diagonal matrix. Determine the rank of the product <span class="math inline">DA</span>. Explain your reasoning.</p></li>
 <li><p>[10 points] <strong>Unexpected SVD</strong> Compute the Singular Value Decomposition (SVD) of the following matrices:</p>
 <ul>
@@ -363,7 +360,7 @@ y^{(i)} &amp;:= \frac{x^{(i)} - \frac{1}{m}\sum_{j=1}^{m} x^{(j)}}{\sqrt{\frac{1
 <li><p>[10 points] Let the sequence <span class="math inline">\{r_k\}</span> be defined by <span class="math display">
 r_{k+1} =
 \begin{cases}
-\frac{1}{2}\,r_k, &amp; \text{if } k \text{ is even},
+\frac{1}{2}\,r_k, &amp; \text{if } k \text{ is even}, \\
 r_k^2, &amp; \text{if } k \text{ is odd},
 \end{cases}
 </span> with initial value <span class="math inline">0 &lt; r_0 &lt; 1</span>. Prove that <span class="math inline">\{r_k\}</span> converges to 0 and analyze its convergence rate. In your answer, determine whether the overall convergence is linear, superlinear, or quadratic.</p></li>
