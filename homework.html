@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -68,10 +102,55 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/copy-tex.min.js" integrity="sha384-ww/583aHhxWkz5DEVn6OKtNiIaLi2iBRNZXfJRiY1Ai7tnJ9UXpEsyvOITVpTl4A" crossorigin="anonymous"></script>
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <meta property="og:title" content="💀 Домашка">
+<meta property="og:image" content="https://hse25.fmin.xyz/linesearch.svg">
 <meta name="twitter:title" content="💀 Домашка">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hse25.fmin.xyz/linesearch.svg">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 
 <body class="nav-fixed">
@@ -116,8 +195,19 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#linear-algebra-basics" id="toc-linear-algebra-basics" class="nav-link active" data-scroll-target="#linear-algebra-basics">Linear algebra basics</a></li>
+  <li><a href="#convergence-rates" id="toc-convergence-rates" class="nav-link" data-scroll-target="#convergence-rates">Convergence rates</a></li>
+  <li><a href="#line-search" id="toc-line-search" class="nav-link" data-scroll-target="#line-search">Line search</a></li>
+  <li><a href="#matrix-calculus" id="toc-matrix-calculus" class="nav-link" data-scroll-target="#matrix-calculus">Matrix calculus</a></li>
+  <li><a href="#automatic-differentiation-and-jax" id="toc-automatic-differentiation-and-jax" class="nav-link" data-scroll-target="#automatic-differentiation-and-jax">Automatic differentiation and jax</a></li>
+  <li><a href="#convexity" id="toc-convexity" class="nav-link" data-scroll-target="#convexity">Convexity</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/MerkulovDaniil/hse25/edit/main/homework.md" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -126,8 +216,484 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="linear-algebra-basics" class="level3">
+<h3 class="anchored" data-anchor-id="linear-algebra-basics">Linear algebra basics</h3>
+<ol type="1">
+<li>[6 points] <strong>Sensitivity Analysis in Linear Systems</strong> Consider a nonsingular matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span> and a vector <span class="math inline">b \in \mathbb{R}^n</span>. Suppose that due to measurement or computational errors, the vector <span class="math inline">b</span> is perturbed to <span class="math inline">\tilde{b} = b + \delta b</span>.<br>
+</li>
+</ol>
+<ol type="a">
+<li>Derive an upper bound for the relative error in the solution <span class="math inline">x</span> of the system <span class="math inline">Ax = b</span> in terms of the condition number <span class="math inline">\kappa(A)</span> and the relative error in <span class="math inline">b</span>.<br>
+</li>
+<li>Provide a concrete example using a <span class="math inline">2 \times 2</span> matrix where <span class="math inline">\kappa(A)</span> is large (say, <span class="math inline">\geq 100500</span>).</li>
+</ol>
+<ol type="1">
+<li><p>[10 points] <strong>Effect of Diagonal Scaling on Rank</strong> Let <span class="math inline">A \in \mathbb{R}^{n \times n}</span> be a matrix with rank <span class="math inline">r</span>. Suppose <span class="math inline">D \in \mathbb{R}^{n \times n}</span> is a diagonal matrix. Determine the rank of the product <span class="math inline">DA</span>. Explain your reasoning.</p></li>
+<li><p>[10 points] <strong>Unexpected SVD</strong> Compute the Singular Value Decomposition (SVD) of the following matrices:</p>
+<ul>
+<li><span class="math inline">A_1 = \begin{bmatrix} 2 \\ 2 \\ 8 \end{bmatrix}</span></li>
+<li><span class="math inline">A_2 = \begin{bmatrix} 0 &amp; x \\ x &amp; 0 \\ 0 &amp; 0 \end{bmatrix}</span>, where <span class="math inline">x</span> is the sum of your birthdate numbers (day + month).</li>
+</ul></li>
+<li><p>[10 points] <strong>Effect of normalization on rank</strong> Assume we have a set of data points <span class="math inline">x^{(i)}\in\mathbb{R}^{n},\,i=1,\dots,m</span>, and decide to represent this data as a matrix <span class="math display">
+X =
+\begin{pmatrix}
+  | &amp; &amp; | \\
+  x^{(1)} &amp; \dots &amp; x^{(m)} \\
+  | &amp; &amp; | \\
+\end{pmatrix} \in \mathbb{R}^{n \times m}.
+</span></p>
+<p>We suppose that <span class="math inline">\text{rank}\,X = r</span>.</p>
+<p>In the problem below, we ask you to find the rank of some matrix <span class="math inline">M</span> related to <span class="math inline">X</span>. In particular, you need to find relation between <span class="math inline">\text{rank}\,X = r</span> and <span class="math inline">\text{rank}\,M</span>, e.g., that the rank of <span class="math inline">M</span> is always larger/smaller than the rank of <span class="math inline">X</span> or that <span class="math inline">\text{rank}\,M = \text{rank}\,X \big / 35</span>. Please support your answer with legitimate arguments and make the answer as accurate as possible.</p>
+<p>Note that border cases are possible depending on the structure of the matrix <span class="math inline">X</span>. Make sure to cover them in your answer correctly.</p>
+<p>In applied statistics and machine learning, data is often normalized. One particularly popular strategy is to subtract the estimated mean <span class="math inline">\mu</span> and divide by the square root of the estimated variance <span class="math inline">\sigma^2</span>. i.e. <span class="math display">
+x \rightarrow (x - \mu) \big / \sigma.
+</span> After the normalization, we get a new matrix <span class="math display">
+\begin{split}
+Y &amp;:=
+\begin{pmatrix}
+  | &amp; &amp; | \\
+  y^{(1)} &amp; \dots &amp; y^{(m)} \\
+  | &amp; &amp; | \\
+\end{pmatrix},\\
+y^{(i)} &amp;:= \frac{x^{(i)} - \frac{1}{m}\sum_{j=1}^{m} x^{(j)}}{\sqrt{\frac{1}{m}\sum_{j=1}^{m} \left(x^{(j)}\right)^2 - \left(\frac{1}{m}\sum_{j=1}^{m} x^{(j)}\right)^2}}.
+\end{split}
+</span> What is the rank of <span class="math inline">Y</span> if <span class="math inline">\text{rank} \; X = r</span>?</p></li>
+<li><p>[20 points] <strong>Image Compression with Truncated SVD</strong> Explore image compression using Truncated Singular Value Decomposition (SVD). Understand how varying the number of singular values affects the quality of the compressed image. Implement a Python script to compress a grayscale image using Truncated SVD and visualize the compression quality.</p>
+<ul>
+<li><strong>Truncated SVD</strong>: Decomposes an image <span class="math inline">A</span> into <span class="math inline">U, S,</span> and <span class="math inline">V</span> matrices. The compressed image is reconstructed using a subset of singular values.</li>
+<li><strong>Mathematical Representation</strong>: <span class="math display">
+  A \approx U_k \Sigma_k V_k^T
+  </span>
+<ul>
+<li><span class="math inline">U_k</span> and <span class="math inline">V_k</span> are the first <span class="math inline">k</span> columns of <span class="math inline">U</span> and <span class="math inline">V</span>, respectively.</li>
+<li><span class="math inline">\Sigma_k</span> is a diagonal matrix with the top <span class="math inline">k</span> singular values.</li>
+<li><strong>Relative Error</strong>: Measures the fidelity of the compressed image compared to the original. <span class="math display">
+  \text{Relative Error} = \frac{\| A - A_k \|}{\| A \|}
+  </span></li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.animation <span class="im">as</span> animation</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage <span class="im">import</span> io, color</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> io <span class="im">import</span> BytesIO</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> download_image(url):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> requests.get(url)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    img <span class="op">=</span> io.imread(BytesIO(response.content))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> color.rgb2gray(img)  <span class="co"># Convert to grayscale</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> update_plot(i, img_plot, error_plot, U, S, V, original_img, errors, ranks, ax1, ax2):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Adjust rank based on the frame index</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i <span class="op">&lt;</span> <span class="dv">70</span>:</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        rank <span class="op">=</span> i <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        rank <span class="op">=</span> <span class="dv">70</span> <span class="op">+</span> (i <span class="op">-</span> <span class="dv">69</span>) <span class="op">*</span> <span class="dv">10</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    reconstructed_img <span class="op">=</span> ... <span class="co"># YOUR CODE HERE </span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate relative error</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    relative_error <span class="op">=</span> ... <span class="co"># YOUR CODE HERE</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    errors.append(relative_error)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    ranks.append(rank)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update the image plot and title</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    img_plot.set_data(reconstructed_img)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    ax1.set_title(<span class="ss">f"Image compression with SVD</span><span class="ch">\n</span><span class="ss"> Rank </span><span class="sc">{</span>rank<span class="sc">}</span><span class="ss">; Relative error </span><span class="sc">{</span>relative_error<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove axis ticks and labels from the first subplot (ax1)</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    ax1.set_xticks([])</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    ax1.set_yticks([])</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update the error plot</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    error_plot.set_data(ranks, errors)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    ax2.set_xlim(<span class="dv">1</span>, <span class="bu">len</span>(S))</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    ax2.grid(linestyle<span class="op">=</span><span class="st">":"</span>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    ax2.set_ylim(<span class="fl">1e-4</span>, <span class="fl">0.5</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    ax2.set_ylabel(<span class="st">'Relative Error'</span>)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    ax2.set_xlabel(<span class="st">'Rank'</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    ax2.set_title(<span class="st">'Relative Error over Rank'</span>)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    ax2.semilogy()</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Set xticks to show rank numbers</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    ax2.set_xticks(<span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(S)<span class="op">+</span><span class="dv">1</span>, <span class="bu">max</span>(<span class="bu">len</span>(S)<span class="op">//</span><span class="dv">10</span>, <span class="dv">1</span>)))  <span class="co"># Adjust the step size as needed</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> img_plot, error_plot</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> create_animation(image, filename<span class="op">=</span><span class="st">'svd_animation.mp4'</span>):</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    U, S, V <span class="op">=</span> np.linalg.svd(image, full_matrices<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    errors <span class="op">=</span> []</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    ranks <span class="op">=</span> []</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">8</span>))</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    img_plot <span class="op">=</span> ax1.imshow(image, cmap<span class="op">=</span><span class="st">'gray'</span>, animated<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    error_plot, <span class="op">=</span> ax2.plot([], [], <span class="st">'r-'</span>, animated<span class="op">=</span><span class="va">True</span>)  <span class="co"># Initial empty plot for errors</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add watermark</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    ax1.text(<span class="dv">1</span>, <span class="fl">1.02</span>, <span class="st">'@fminxyz'</span>, transform<span class="op">=</span>ax1.transAxes, color<span class="op">=</span><span class="st">'gray'</span>, va<span class="op">=</span><span class="st">'bottom'</span>, ha<span class="op">=</span><span class="st">'right'</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Determine frames for the animation</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    initial_frames <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">70</span>))  <span class="co"># First 70 ranks</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    subsequent_frames <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">70</span>, <span class="bu">len</span>(S), <span class="dv">10</span>))  <span class="co"># Every 10th rank after 70</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>    frames <span class="op">=</span> initial_frames <span class="op">+</span> subsequent_frames</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>    ani <span class="op">=</span> animation.FuncAnimation(fig, update_plot, frames<span class="op">=</span><span class="bu">len</span>(frames), fargs<span class="op">=</span>(img_plot, error_plot, U, S, V, image, errors, ranks, ax1, ax2), interval<span class="op">=</span><span class="dv">50</span>, blit<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>    ani.save(filename, writer<span class="op">=</span><span class="st">'ffmpeg'</span>, fps<span class="op">=</span><span class="dv">8</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>    <span class="co"># URL of the image</span></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> <span class="st">""</span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Download the image and create the animation</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>    image <span class="op">=</span> download_image(url)</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>    create_animation(image)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+</section>
+<section id="convergence-rates" class="level3">
+<h3 class="anchored" data-anchor-id="convergence-rates">Convergence rates</h3>
+<ol type="1">
+<li><p>[9 points] Determine (it means to prove the character of convergence if it is convergent) the convergence or divergence of a given sequences</p>
+<ul>
+<li><span class="math inline">r_{k} = \frac{1}{\sqrt{k+5}}</span>.</li>
+<li><span class="math inline">r_{k} = 0.101^k</span>.</li>
+<li><span class="math inline">r_{k} = 0.101^{2^k}</span>.</li>
+</ul></li>
+<li><p>[10 points] Let the sequence <span class="math inline">\{r_k\}</span> be defined by <span class="math display">
+r_{k+1} =
+\begin{cases}
+\frac{1}{2}\,r_k, &amp; \text{if } k \text{ is even},
+r_k^2, &amp; \text{if } k \text{ is odd},
+\end{cases}
+</span> with initial value <span class="math inline">0 &lt; r_0 &lt; 1</span>. Prove that <span class="math inline">\{r_k\}</span> converges to 0 and analyze its convergence rate. In your answer, determine whether the overall convergence is linear, superlinear, or quadratic.</p></li>
+<li><p>[10 points] Determine the following sequence <span class="math inline">\{r_k\}</span> by convergence rate (linear, sublinear, superlinear). In the case of superlinear convergence, determine whether there is quadratic convergence. <span class="math display">
+r_k = \dfrac{1}{k!}
+</span></p></li>
+<li><p>[10 points] Consider the recursive sequence defined by <span class="math display">
+r_{k+1} = \lambda\,r_k + (1-\lambda)\,r_k^p,\quad k\ge0,
+</span> where <span class="math inline">\lambda\in [0,1)</span> and <span class="math inline">p&gt;1</span>. Which additional conditions on <span class="math inline">r_0</span> should be satisfied for the sequence to converge? Show that when <span class="math inline">\lambda&gt;0</span> the sequence converges to 0 with a linear rate (with asymptotic constant <span class="math inline">\lambda</span>), and when <span class="math inline">\lambda=0</span> determine the convergence rate in terms of <span class="math inline">p</span>. In particular, for <span class="math inline">p=2</span> decide whether the convergence is quadratic.</p></li>
+</ol>
+</section>
+<section id="line-search" class="level3">
+<h3 class="anchored" data-anchor-id="line-search">Line search</h3>
+<ol type="1">
+<li><p>[10 points] Consider a quadratic function <span class="math inline">f: \mathbb{R}^n \rightarrow \mathbb{R}</span>, and let us start from a point <span class="math inline">x_k \in \mathbb{R}^n</span> moving in the direction of the antigradient <span class="math inline">-\nabla f(x_k)</span>, note that <span class="math inline">\nabla f(x_k)\neq 0</span>. Show that the minimum of <span class="math inline">f</span> along this direction as a function of the step size <span class="math inline">\alpha</span>, for a decreasing function at <span class="math inline">x_k</span>, satisfies Armijo’s condition for any <span class="math inline">c_1</span> in the range <span class="math inline">0 \leq c_1 \leq \frac{1}{2}</span>. Specifically, demonstrate that the following inequality holds at the optimal <span class="math inline">\alpha^*</span>: <span class="math display">
+\varphi(\alpha) = f(x_{k+1}) = f(x_k - \alpha \nabla f(x_k)) \leq f(x_k) - c_1 \alpha \|\nabla f(x_k)\|_2^2
+</span></p></li>
+<li><p><strong>Implementing and Testing Line Search Conditions in Gradient Descent</strong> [36 points] <span class="math display">
+x_{k+1} = x_k - \alpha \nabla f(x_k)
+</span> In this assignment, you will modify an existing Python code for gradient descent to include various line search conditions. You will test these modifications on two functions: a quadratic function and the Rosenbrock function. The main objectives are to understand how different line search strategies influence the convergence of the gradient descent algorithm and to compare their efficiencies based on the number of function evaluations.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize_scalar</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">214</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the quadratic function and its gradient</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> quadratic_function(x, A, b):</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fl">0.5</span> <span class="op">*</span> np.dot(x.T, np.dot(A, x)) <span class="op">-</span> np.dot(b.T, x)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> grad_quadratic(x, A, b):</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.dot(A, x) <span class="op">-</span> b</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate a 2D quadratic problem with a specified condition number</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> generate_quadratic_problem(cond_number):</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Random symmetric matrix</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> np.random.randn(<span class="dv">2</span>, <span class="dv">2</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> np.dot(M, M.T)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Ensure the matrix has the desired condition number</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    U, s, V <span class="op">=</span> np.linalg.svd(M)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> np.linspace(cond_number, <span class="dv">1</span>, <span class="bu">len</span>(s))  <span class="co"># Spread the singular values</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> np.dot(U, np.dot(np.diag(s), V))</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Random b</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> np.random.randn(<span class="dv">2</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A, b</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Gradient descent function</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gradient_descent(start_point, A, b, stepsize_func, max_iter<span class="op">=</span><span class="dv">100</span>):</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> start_point.copy()</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    trajectory <span class="op">=</span> [x.copy()]</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        grad <span class="op">=</span> grad_quadratic(x, A, b)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        step_size <span class="op">=</span> stepsize_func(x, grad)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        x <span class="op">-=</span> step_size <span class="op">*</span> grad</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        trajectory.append(x.copy())</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(trajectory)</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Backtracking line search strategy using scipy</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> backtracking_line_search(x, grad, A, b, alpha<span class="op">=</span><span class="fl">0.3</span>, beta<span class="op">=</span><span class="fl">0.8</span>):</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> objective(t):</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> quadratic_function(x <span class="op">-</span> t <span class="op">*</span> grad, A, b)</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> minimize_scalar(objective, method<span class="op">=</span><span class="st">'golden'</span>)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res.x</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate ill-posed problem</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>cond_number <span class="op">=</span> <span class="dv">30</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>A, b <span class="op">=</span> generate_quadratic_problem(cond_number)</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Starting point</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>start_point <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">1.8</span>])</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform gradient descent with both strategies</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>trajectory_fixed <span class="op">=</span> gradient_descent(start_point, A, b, <span class="kw">lambda</span> x, g: <span class="fl">5e-2</span>)</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>trajectory_backtracking <span class="op">=</span> gradient_descent(start_point, A, b, <span class="kw">lambda</span> x, g: backtracking_line_search(x, g, A, b))</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the trajectories on a contour plot</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>x1, x2 <span class="op">=</span> np.meshgrid(np.linspace(<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">400</span>), np.linspace(<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">400</span>))</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> np.array([quadratic_function(np.array([x, y]), A, b) <span class="cf">for</span> x, y <span class="kw">in</span> <span class="bu">zip</span>(x1.flatten(), x2.flatten())]).reshape(x1.shape)</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>plt.contour(x1, x2, Z, levels<span class="op">=</span><span class="dv">50</span>, cmap<span class="op">=</span><span class="st">'viridis'</span>)</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>plt.plot(trajectory_fixed[:, <span class="dv">0</span>], trajectory_fixed[:, <span class="dv">1</span>], <span class="st">'o-'</span>, label<span class="op">=</span><span class="st">'Fixed Step Size'</span>)</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>plt.plot(trajectory_backtracking[:, <span class="dv">0</span>], trajectory_backtracking[:, <span class="dv">1</span>], <span class="st">'o-'</span>, label<span class="op">=</span><span class="st">'Backtracking Line Search'</span>)</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a><span class="co"># Add markers for start and optimal points</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>plt.plot(start_point[<span class="dv">0</span>], start_point[<span class="dv">1</span>], <span class="st">'ro'</span>, label<span class="op">=</span><span class="st">'Start Point'</span>)</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>optimal_point <span class="op">=</span> np.linalg.solve(A, b)</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>plt.plot(optimal_point[<span class="dv">0</span>], optimal_point[<span class="dv">1</span>], <span class="st">'y*'</span>, markersize<span class="op">=</span><span class="dv">15</span>, label<span class="op">=</span><span class="st">'Optimal Point'</span>)</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Gradient Descent Trajectories on Quadratic Function'</span>)</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'x1'</span>)</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'x2'</span>)</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">"linesearch.svg"</span>)</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="linesearch.svg" class="img-fluid figure-img"></p>
+<figcaption>The code above plots this</figcaption>
+</figure>
+</div>
+<p>Start by reviewing the provided Python code. This code implements gradient descent with a fixed step size and a backtracking line search on a quadratic function. Familiarize yourself with how the gradient descent function and the step size strategies are implemented.</p>
+<ol type="1">
+<li><p>[10/36 points] Modify the gradient descent function to include the following line search conditions:</p>
+<ol type="1">
+<li>Dichotomy</li>
+<li>Sufficient Decrease Condition</li>
+<li>Wolfe Condition</li>
+<li>Polyak step size <span class="math display">
+\alpha_k = \frac{f(x_k) - f^*}{\|\nabla f(x_k)\|_2^2},
+</span> where <span class="math inline">f^*</span> is the optimal value of the function. It seems strange to use the optimal value of the function in the step size, but there are options to estimate it even without knowing the optimal value.<br>
+</li>
+<li>Sign Gradient Method: <span class="math display">
+\alpha_k = \frac{1}{\|\nabla f(x_k)\|_2},
+</span> Test your modified gradient descent algorithm with the implemented step size search conditions on the provided quadratic function. Plot the trajectories over iterations for each condition. Choose and specify hyperparameters for inexact line search conditions. Choose and specify the <strong>termination criterion</strong>. Start from the point <span class="math inline">x_0 = (-1, 2)^T</span>.</li>
+</ol></li>
+<li><p>[8/36 points] Compare these 7 methods from the budget perspective. Plot the graph of function value from the number of function evaluations for each method on the same graph.</p></li>
+<li><p>[10/36 points] Plot trajectory for another function with the same set of methods <span class="math display">
+f(x_1, x_2) =  10(x_2 − x_1^2)^2 + (x_1 − 1)^2
+</span> with <span class="math inline">x_0 = (-1, 2)^T</span>. You might need to adjust hyperparameters.</p></li>
+<li><p>[8/36 points] Plot the same function value from the number of function calls for this experiment.</p></li>
+</ol></li>
+</ol>
+</section>
+<section id="matrix-calculus" class="level3">
+<h3 class="anchored" data-anchor-id="matrix-calculus">Matrix calculus</h3>
+<ol type="1">
+<li><p>[10 points] Find the gradient <span class="math inline">\nabla f(x)</span> and hessian <span class="math inline">f^{\prime\prime}(x)</span>, if <span class="math inline">f(x) = \frac{1}{2}\Vert A - xx^T\Vert ^2_F, A \in \mathbb{S}^n</span></p></li>
+<li><p>[10 points] Find the gradient <span class="math inline">\nabla f(x)</span> and hessian <span class="math inline">f''(x)</span>, if <span class="math inline">f(x) = \dfrac{1}{2} \Vert Ax - b\Vert^2_2</span>.</p></li>
+<li><p>[10 points] Find the gradient <span class="math inline">\nabla f(x)</span> and hessian <span class="math inline">f''(x)</span>, if <span class="math display">
+f(x) = \frac1m \sum\limits_{i=1}^m \log \left( 1 + \exp(a_i^{T}x) \right) + \frac{\mu}{2}\Vert x\Vert _2^2, \; a_i, x \in \mathbb R^n, \; \mu&gt;0
+</span></p></li>
+<li><p>[10 points] Compute the gradient <span class="math inline">\nabla_A f(A)</span> of the trace of the matrix exponential function <span class="math inline">f(A) = \text{tr}(e^A)</span> with respect to <span class="math inline">A</span>. Hint: Use the definition of the matrix exponential. Use the definition of the differential <span class="math inline">df = f(A + dA) - f(A) + o(\Vert dA \Vert)</span> with the limit <span class="math inline">\Vert dA \Vert \to 0</span>.</p></li>
+<li><p>[20 points] <strong>Principal Component Analysis through gradient calculation.</strong> Let there be a dataset <span class="math inline">\{x_i\}_{i=1}^N, x_i \in \mathbb{R}^D</span>, which we want to transform into a dataset of reduced dimensionality <span class="math inline">d</span> using projection onto a linear subspace defined by the matrix <span class="math inline">P \in \mathbb{R}^{D \times d}</span>. The orthogonal projection of a vector <span class="math inline">x</span> onto this subspace can be computed as <span class="math inline">P(P^TP)^{-1}P^Tx</span>. To find the optimal matrix <span class="math inline">P</span>, consider the following optimization problem: <span class="math display">
+F(P) = \sum_{i=1}^N \|x_i - P(P^TP)^{-1}P^Tx_i\|^2 = N \cdot \text{tr}\left((I - P(P^TP)^{-1}P^T)^2 S\right) \to \min_{P \in \mathbb{R}^{D \times d}},
+</span> where <span class="math inline">S = \frac{1}{N} \sum_{i=1}^N x_i x_i^T</span> is the sample covariance matrix for the normalized dataset.</p>
+<ol type="1">
+<li><p>Find the gradient <span class="math inline">\nabla_P F(P)</span>, calculated for an arbitrary matrix <span class="math inline">P</span> with orthogonal columns, i.e., <span class="math inline">P : P^T P = I</span>.</p>
+<p><em>Hint: When calculating the differential <span class="math inline">dF(P)</span>, first treat <span class="math inline">P</span> as an arbitrary matrix, and then use the orthogonality property of the columns of <span class="math inline">P</span> in the resulting expression.</em></p></li>
+<li><p>Consider the eigendecomposition of the matrix <span class="math inline">S</span>: <span class="math display">
+S = Q \Lambda Q^T,
+</span> where <span class="math inline">\Lambda</span> is a diagonal matrix with eigenvalues on the diagonal, and <span class="math inline">Q = [q_1 | q_2 | \ldots | q_D] \in \mathbb{R}^{D \times D}</span> is an orthogonal matrix consisting of eigenvectors <span class="math inline">q_i</span> as columns. Prove the following:</p>
+<ol type="1">
+<li>The gradient <span class="math inline">\nabla_P F(P)</span> equals zero for any matrix <span class="math inline">P</span> composed of <span class="math inline">d</span> distinct eigenvectors <span class="math inline">q_i</span> as its columns.</li>
+<li>The minimum value of <span class="math inline">F(P)</span> is achieved for the matrix <span class="math inline">P</span> composed of eigenvectors <span class="math inline">q_i</span> corresponding to the largest eigenvalues of <span class="math inline">S</span>.</li>
+</ol></li>
+</ol></li>
+</ol>
+</section>
+<section id="automatic-differentiation-and-jax" class="level3">
+<h3 class="anchored" data-anchor-id="automatic-differentiation-and-jax">Automatic differentiation and jax</h3>
+<ol type="1">
+<li><p><strong>Benchmarking Hessian-Vector Product (HVP) Computation in a Neural Network via JAX</strong> [22 points]</p>
+<p>You are given a simple neural network model (an MLP with several hidden layers using a nonlinearity such as GELU). The model’s parameters are defined by the weights of its layers. Your task is to compare different approaches for computing the Hessian-vector product (HVP) with respect to the model’s loss and to study how the computation time scales as the model grows in size.</p>
+<p><strong>Model and Loss Definition:</strong> [2/22 points] Here is the code for the model and loss definition. Write a method <code>get_params()</code> that returns the flattened vector of all model weights.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> jax</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> jax.numpy <span class="im">as</span> jnp</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm.auto <span class="im">import</span> tqdm</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jax.nn <span class="im">import</span> gelu</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Определение MLP модели</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MLP:</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, key, layer_sizes):</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.layer_sizes <span class="op">=</span> layer_sizes</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        keys <span class="op">=</span> jax.random.split(key, <span class="bu">len</span>(layer_sizes) <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.weights <span class="op">=</span> [</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>            jax.random.normal(k, (layer_sizes[i], layer_sizes[i <span class="op">+</span> <span class="dv">1</span>]))</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i, k <span class="kw">in</span> <span class="bu">enumerate</span>(keys)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>            ]</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> w <span class="kw">in</span> <span class="va">self</span>.weights[:<span class="op">-</span><span class="dv">1</span>]:</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> gelu(jnp.dot(x, w))</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> jnp.dot(x, <span class="va">self</span>.weights[<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_params(<span class="va">self</span>):</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        <span class="co">### YOUR CODE HERE </span><span class="al">###</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Hessian and HVP Implementations:</strong> [2/22 points] Write a function</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Функция для вычисления Гессиана</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate_hessian(model, params):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> loss_fn(p):</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> jnp.ones((<span class="dv">1</span>, model.layer_sizes[<span class="dv">0</span>]))  <span class="co"># Заглушка входа</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> jnp.<span class="bu">sum</span>(model.forward(x))</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">### YOUR CODE HERE </span><span class="al">###</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">#hessian_fn =           </span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> hessian_fn(params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>that computes the full Hessian <span class="math inline">H</span> of the loss function with respect to the model parameters using JAX’s automatic differentiation.</p>
+<p><strong>Naive HVP via Full Hessian:</strong> [2/22 points] Write a function <code>naive_hvp(hessian, vector)</code> that, given a precomputed Hessian <span class="math inline">H</span> and a vector <span class="math inline">v</span> (of the same shape as the parameters), computes the Hessian-vector product using a straightforward matrix-vector multiplication.</p>
+<p><strong>Efficient HVP Using Autograd:</strong> [4/22 points] Write a function <code>python   def hvp(f, x, v):       return jax.grad(lambda x: jnp.vdot(jax.grad(f)(x), v))(x)</code> that directly computes the HVP without explicitly forming the full Hessian. This leverages the reverse-mode differentiation capabilities of JAX.</p>
+<p><strong>Timing Experiment:</strong> Consider a family of models with an increasing number of hidden layers.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ns <span class="op">=</span> np.linspace(<span class="dv">50</span>, <span class="dv">1000</span>, <span class="dv">15</span>, dtype<span class="op">=</span><span class="bu">int</span>)  <span class="co"># The number of hidden layers</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>num_runs <span class="op">=</span> <span class="dv">10</span>  <span class="co"># The number of runs for averaging</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>For each model configuration:</p>
+<ul>
+<li>Generate the model and extract its parameter vector.</li>
+<li>Generate a random vector <span class="math inline">v</span> of the same dimension as the parameters.</li>
+<li>Measure (do not forget to use <code>.block_until_ready()</code> to ensure accurate timing and proper synchronization) the following:
+<ol type="1">
+<li><strong>Combined Time (Full Hessian + Naive HVP):</strong> The total time required to compute the full Hessian and then perform the matrix-vector multiplication.</li>
+<li><strong>Naive HVP Time (Excluding Hessian Computation):</strong> The time required to perform the matrix-vector multiplication given a precomputed Hessian.</li>
+<li><strong>Efficient HVP Time:</strong> The time required to compute the HVP using the autograd-based function.</li>
+</ol></li>
+<li>Repeat each timing measurement for a fixed number of runs (e.g., 10 runs) and record both the mean and standard deviation of the computation times.</li>
+</ul>
+<p><strong>Visualization and Analysis:</strong> [12/22 points]</p>
+<ul>
+<li>Plot the timing results for the three methods on the same graph. For each method, display error bars corresponding to the standard deviation over the runs.</li>
+<li>Label the axes clearly (e.g., “Number of Layers” vs.&nbsp;“Computation Time (seconds)”) and include a legend indicating which curve corresponds to which method.</li>
+<li>Analyze the scaling behavior. Try analytically derive the scaling of the methods and compare it with the experimental results.</li>
+</ul></li>
+<li><p>[15 points] We can use automatic differentiation not only to calculate necessary gradients but also for tuning hyperparameters of the algorithm like learning rate in gradient descent (with gradient descent 🤯). Suppose, we have the following function <span class="math inline">f(x) = \frac{1}{2}\Vert x\Vert^2</span>, select a random point <span class="math inline">x_0 \in \mathbb{B}^{1000} = \{0 \leq x_i \leq 1 \mid \forall i\}</span>. Consider <span class="math inline">10</span> steps of the gradient descent starting from the point <span class="math inline">x_0</span>: <span class="math display">
+x_{k+1} = x_k - \alpha_k \nabla f(x_k)
+</span> Your goal in this problem is to write the function, that takes <span class="math inline">10</span> scalar values <span class="math inline">\alpha_i</span> and return the result of the gradient descent on function <span class="math inline">L = f(x_{10})</span>. And optimize this function using gradient descent on <span class="math inline">\alpha \in \mathbb{R}^{10}</span>. Suppose that each of <span class="math inline">10</span> components of <span class="math inline">\alpha</span> is uniformly distributed on <span class="math inline">[0; 0.1]</span>. <span class="math display">
+\alpha_{k+1} = \alpha_k - \beta \frac{\partial L}{\partial \alpha}
+</span> Choose any constant <span class="math inline">\beta</span> and the number of steps you need. Describe the obtained results. How would you understand, that the obtained schedule (<span class="math inline">\alpha \in \mathbb{R}^{10}</span>) becomes better than it was at the start? How do you check numerically local optimality in this problem?</p></li>
+</ol>
+</section>
+<section id="convexity" class="level3">
+<h3 class="anchored" data-anchor-id="convexity">Convexity</h3>
+<ol type="1">
+<li><p>[10 points] Show that this function is convex.: <span class="math display">
+f(x, y, z) = z \log \left(e^{\frac{x}{z}} + e^{\frac{y}{z}}\right) + (z - 2)^2 + e^{\frac{1}{x + y}}
+</span> where the function <span class="math inline">f : \mathbb{R}^3 \to \mathbb{R}</span> has its domain defined as: <span class="math display">
+\text{dom } f = \{ (x, y, z) \in \mathbb{R}^3 : x + y &gt; 0, \, z &gt; 0 \}.
+</span></p></li>
+<li><p>[5 points] The center of mass of a body is an important concept in physics (mechanics). For a system of material points with masses <span class="math inline">m_i</span> and coordinates <span class="math inline">x_i</span>, the center of mass is given by: <span class="math display">
+x_c = \frac{\sum_{i=1}^k m_i x_i}{\sum_{i=1}^k m_i}
+</span> The center of mass of a body does not always lie inside the body. For example, the center of mass of a doughnut is located in its hole. Prove that the center of mass of a system of material points lies in the convex hull of the set of these points.</p></li>
+<li><p>[10 points] Show, that <span class="math inline">\mathbf{conv}\{xx^\top: x \in \mathbb{R}^n, \Vert x\Vert  = 1\} = \{A \in \mathbb{S}^n_+: \text{tr}(A) = 1\}</span>.</p></li>
+<li><p>[5 points] Prove that the set of <span class="math inline">\{x \in \mathbb{R}^2 \mid e^{x_1}\le x_2\}</span> is convex.</p></li>
+<li><p>[10 points] Consider the function <span class="math inline">f(x) = x^d</span>, where <span class="math inline">x \in \mathbb{R}_{+}</span>. Fill the following table with ✅ or ❎. Explain your answers</p>
+<div class="table-responsive">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><span class="math inline">d</span></th>
+<th style="text-align: center;">Convex</th>
+<th style="text-align: center;">Concave</th>
+<th style="text-align: center;">Strictly Convex</th>
+<th style="text-align: center;"><span class="math inline">\mu</span>-strongly convex</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><span class="math inline">-2, x \in \mathbb{R}_{++}</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><span class="math inline">-1, x \in \mathbb{R}_{++}</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><span class="math inline">0</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><span class="math inline">0.5</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><span class="math inline">1</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><span class="math inline">\in (1; 2)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><span class="math inline">2</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><span class="math inline">&gt; 2</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+</div></li>
+<li><p>[10 points] Prove that the entropy function, defined as <span class="math display">
+f(x) = -\sum_{i=1}^n x_i \log(x_i),
+</span> with <span class="math inline">\text{dom}(f) = \{x \in \R^n_{++} : \sum_{i=1}^n x_i = 1\}</span>, is strictly concave.</p></li>
+<li><p>[10 points] Show that the maximum of a convex function <span class="math inline">f</span> over the polyhedron <span class="math inline">P = \text{conv}\{v_1, \ldots, v_k\}</span> is achieved at one of its vertices, i.e., <span class="math display">
+\sup_{x \in P} f(x) = \max_{i=1, \ldots, k} f(v_i).
+</span></p>
+<p>A stronger statement is: the maximum of a convex function over a closed bounded convex set is achieved at an extreme point, i.e., a point in the set that is not a convex combination of any other points in the set. (you do not have to prove it). <em>Hint:</em> Assume the statement is false, and use Jensen’s inequality.</p></li>
+<li><p>[10 points] Show, that the two definitions of <span class="math inline">\mu</span>-strongly convex functions are equivalent:</p>
+<ol type="1">
+<li><p><span class="math inline">f(x)</span> is <span class="math inline">\mu</span>-strongly convex <span class="math inline">\iff</span> for any <span class="math inline">x_1, x_2 \in S</span> and <span class="math inline">0 \le \lambda \le 1</span> for some <span class="math inline">\mu &gt; 0</span>: <span class="math display">
+f(\lambda x_1 + (1 - \lambda)x_2) \le \lambda f(x_1) + (1 - \lambda)f(x_2) - \frac{\mu}{2} \lambda (1 - \lambda)\|x_1 - x_2\|^2
+</span></p></li>
+<li><p><span class="math inline">f(x)</span> is <span class="math inline">\mu</span>-strongly convex <span class="math inline">\iff</span> if there exists <span class="math inline">\mu&gt;0</span> such that the function <span class="math inline">f(x) - \dfrac{\mu}{2}\Vert x\Vert^2</span> is convex.</p></li>
+</ol></li>
+</ol>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -557,4 +1123,4 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions"><ul><li><a href="https://github.com/MerkulovDaniil/hse25/edit/main/homework.md" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div></div></footer></body></html>
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/MerkulovDaniil/hse25/edit/main/homework.md" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div></div></footer></body></html>
