@@ -219,14 +219,14 @@ window.Quarto = {
 <section id="linear-algebra-basics" class="level3">
 <h3 class="anchored" data-anchor-id="linear-algebra-basics">Linear algebra basics</h3>
 <ol type="1">
-<li><p>[6 points] <strong>Sensitivity Analysis in Linear Systems</strong> Consider a nonsingular matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span> and a vector <span class="math inline">b \in \mathbb{R}^n</span>. Suppose that due to measurement or computational errors, the vector <span class="math inline">b</span> is perturbed to <span class="math inline">\tilde{b} = b + \delta b</span>.</p>
+<li><p>[5 points] <strong>Sensitivity Analysis in Linear Systems</strong> Consider a nonsingular matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span> and a vector <span class="math inline">b \in \mathbb{R}^n</span>. Suppose that due to measurement or computational errors, the vector <span class="math inline">b</span> is perturbed to <span class="math inline">\tilde{b} = b + \delta b</span>.</p>
 <ol type="1">
 <li>Derive an upper bound for the relative error in the solution <span class="math inline">x</span> of the system <span class="math inline">Ax = b</span> in terms of the condition number <span class="math inline">\kappa(A)</span> and the relative error in <span class="math inline">b</span>.<br>
 </li>
 <li>Provide a concrete example using a <span class="math inline">2 \times 2</span> matrix where <span class="math inline">\kappa(A)</span> is large (say, <span class="math inline">\geq 100500</span>).</li>
 </ol></li>
-<li><p>[10 points] <strong>Effect of Diagonal Scaling on Rank</strong> Let <span class="math inline">A \in \mathbb{R}^{n \times n}</span> be a matrix with rank <span class="math inline">r</span>. Suppose <span class="math inline">D \in \mathbb{R}^{n \times n}</span> is a diagonal matrix. Determine the rank of the product <span class="math inline">DA</span>. Explain your reasoning.</p></li>
-<li><p>[10 points] <strong>Unexpected SVD</strong> Compute the Singular Value Decomposition (SVD) of the following matrices:</p>
+<li><p>[5 points] <strong>Effect of Diagonal Scaling on Rank</strong> Let <span class="math inline">A \in \mathbb{R}^{n \times n}</span> be a matrix with rank <span class="math inline">r</span>. Suppose <span class="math inline">D \in \mathbb{R}^{n \times n}</span> is a diagonal matrix. Determine the rank of the product <span class="math inline">DA</span>. Explain your reasoning.</p></li>
+<li><p>[8 points] <strong>Unexpected SVD</strong> Compute the Singular Value Decomposition (SVD) of the following matrices:</p>
 <ul>
 <li><span class="math inline">A_1 = \begin{bmatrix} 2 \\ 2 \\ 8 \end{bmatrix}</span></li>
 <li><span class="math inline">A_2 = \begin{bmatrix} 0 &amp; x \\ x &amp; 0 \\ 0 &amp; 0 \end{bmatrix}</span>, where <span class="math inline">x</span> is the sum of your birthdate numbers (day + month).</li>
@@ -351,23 +351,23 @@ y^{(i)} &amp;:= \frac{x^{(i)} - \frac{1}{m}\sum_{j=1}^{m} x^{(j)}}{\sqrt{\frac{1
 <section id="convergence-rates" class="level3">
 <h3 class="anchored" data-anchor-id="convergence-rates">Convergence rates</h3>
 <ol type="1">
-<li><p>[9 points] Determine (it means to prove the character of convergence if it is convergent) the convergence or divergence of a given sequences</p>
+<li><p>[6 points] Determine (it means to prove the character of convergence if it is convergent) the convergence or divergence of a given sequences</p>
 <ul>
 <li><span class="math inline">r_{k} = \frac{1}{\sqrt{k+5}}</span>.</li>
 <li><span class="math inline">r_{k} = 0.101^k</span>.</li>
 <li><span class="math inline">r_{k} = 0.101^{2^k}</span>.</li>
 </ul></li>
-<li><p>[10 points] Let the sequence <span class="math inline">\{r_k\}</span> be defined by <span class="math display">
+<li><p>[8 points] Let the sequence <span class="math inline">\{r_k\}</span> be defined by <span class="math display">
 r_{k+1} =
 \begin{cases}
 \frac{1}{2}\,r_k, &amp; \text{if } k \text{ is even}, \\
 r_k^2, &amp; \text{if } k \text{ is odd},
 \end{cases}
 </span> with initial value <span class="math inline">0 &lt; r_0 &lt; 1</span>. Prove that <span class="math inline">\{r_k\}</span> converges to 0 and analyze its convergence rate. In your answer, determine whether the overall convergence is linear, superlinear, or quadratic.</p></li>
-<li><p>[10 points] Determine the following sequence <span class="math inline">\{r_k\}</span> by convergence rate (linear, sublinear, superlinear). In the case of superlinear convergence, determine whether there is quadratic convergence. <span class="math display">
+<li><p>[6 points] Determine the following sequence <span class="math inline">\{r_k\}</span> by convergence rate (linear, sublinear, superlinear). In the case of superlinear convergence, determine whether there is quadratic convergence. <span class="math display">
 r_k = \dfrac{1}{k!}
 </span></p></li>
-<li><p>[10 points] Consider the recursive sequence defined by <span class="math display">
+<li><p>[8 points] Consider the recursive sequence defined by <span class="math display">
 r_{k+1} = \lambda\,r_k + (1-\lambda)\,r_k^p,\quad k\ge0,
 </span> where <span class="math inline">\lambda\in [0,1)</span> and <span class="math inline">p&gt;1</span>. Which additional conditions on <span class="math inline">r_0</span> should be satisfied for the sequence to converge? Show that when <span class="math inline">\lambda&gt;0</span> the sequence converges to 0 with a linear rate (with asymptotic constant <span class="math inline">\lambda</span>), and when <span class="math inline">\lambda=0</span> determine the convergence rate in terms of <span class="math inline">p</span>. In particular, for <span class="math inline">p=2</span> decide whether the convergence is quadratic.</p></li>
 </ol>
@@ -492,12 +492,12 @@ f(x_1, x_2) =  10(x_2 − x_1^2)^2 + (x_1 − 1)^2
 <section id="matrix-calculus" class="level3">
 <h3 class="anchored" data-anchor-id="matrix-calculus">Matrix calculus</h3>
 <ol type="1">
-<li><p>[10 points] Find the gradient <span class="math inline">\nabla f(x)</span> and hessian <span class="math inline">f^{\prime\prime}(x)</span>, if <span class="math inline">f(x) = \frac{1}{2}\Vert A - xx^T\Vert ^2_F, A \in \mathbb{S}^n</span></p></li>
-<li><p>[10 points] Find the gradient <span class="math inline">\nabla f(x)</span> and hessian <span class="math inline">f''(x)</span>, if <span class="math inline">f(x) = \dfrac{1}{2} \Vert Ax - b\Vert^2_2</span>.</p></li>
-<li><p>[10 points] Find the gradient <span class="math inline">\nabla f(x)</span> and hessian <span class="math inline">f''(x)</span>, if <span class="math display">
+<li><p>[6 points] Find the gradient <span class="math inline">\nabla f(x)</span> and hessian <span class="math inline">f^{\prime\prime}(x)</span>, if <span class="math inline">f(x) = \frac{1}{2}\Vert A - xx^T\Vert ^2_F, A \in \mathbb{S}^n</span></p></li>
+<li><p>[6 points] Find the gradient <span class="math inline">\nabla f(x)</span> and hessian <span class="math inline">f''(x)</span>, if <span class="math inline">f(x) = \dfrac{1}{2} \Vert Ax - b\Vert^2_2</span>.</p></li>
+<li><p>[8 points] Find the gradient <span class="math inline">\nabla f(x)</span> and hessian <span class="math inline">f''(x)</span>, if <span class="math display">
 f(x) = \frac1m \sum\limits_{i=1}^m \log \left( 1 + \exp(a_i^{T}x) \right) + \frac{\mu}{2}\Vert x\Vert _2^2, \; a_i, x \in \mathbb R^n, \; \mu&gt;0
 </span></p></li>
-<li><p>[10 points] Compute the gradient <span class="math inline">\nabla_A f(A)</span> of the trace of the matrix exponential function <span class="math inline">f(A) = \text{tr}(e^A)</span> with respect to <span class="math inline">A</span>. Hint: Use the definition of the matrix exponential. Use the definition of the differential <span class="math inline">df = f(A + dA) - f(A) + o(\Vert dA \Vert)</span> with the limit <span class="math inline">\Vert dA \Vert \to 0</span>.</p></li>
+<li><p>[8 points] Compute the gradient <span class="math inline">\nabla_A f(A)</span> of the trace of the matrix exponential function <span class="math inline">f(A) = \text{tr}(e^A)</span> with respect to <span class="math inline">A</span>. Hint: Use the definition of the matrix exponential. Use the definition of the differential <span class="math inline">df = f(A + dA) - f(A) + o(\Vert dA \Vert)</span> with the limit <span class="math inline">\Vert dA \Vert \to 0</span>.</p></li>
 <li><p>[20 points] <strong>Principal Component Analysis through gradient calculation.</strong> Let there be a dataset <span class="math inline">\{x_i\}_{i=1}^N, x_i \in \mathbb{R}^D</span>, which we want to transform into a dataset of reduced dimensionality <span class="math inline">d</span> using projection onto a linear subspace defined by the matrix <span class="math inline">P \in \mathbb{R}^{D \times d}</span>. The orthogonal projection of a vector <span class="math inline">x</span> onto this subspace can be computed as <span class="math inline">P(P^TP)^{-1}P^Tx</span>. To find the optimal matrix <span class="math inline">P</span>, consider the following optimization problem: <span class="math display">
 F(P) = \sum_{i=1}^N \|x_i - P(P^TP)^{-1}P^Tx_i\|^2 = N \cdot \text{tr}\left((I - P(P^TP)^{-1}P^T)^2 S\right) \to \min_{P \in \mathbb{R}^{D \times d}},
 </span> where <span class="math inline">S = \frac{1}{N} \sum_{i=1}^N x_i x_i^T</span> is the sample covariance matrix for the normalized dataset.</p>
@@ -599,9 +599,9 @@ f(x, y, z) = z \log \left(e^{\frac{x}{z}} + e^{\frac{y}{z}}\right) + (z - 2)^2 +
 <li><p>[5 points] The center of mass of a body is an important concept in physics (mechanics). For a system of material points with masses <span class="math inline">m_i</span> and coordinates <span class="math inline">x_i</span>, the center of mass is given by: <span class="math display">
 x_c = \frac{\sum_{i=1}^k m_i x_i}{\sum_{i=1}^k m_i}
 </span> The center of mass of a body does not always lie inside the body. For example, the center of mass of a doughnut is located in its hole. Prove that the center of mass of a system of material points lies in the convex hull of the set of these points.</p></li>
-<li><p>[10 points] Show, that <span class="math inline">\mathbf{conv}\{xx^\top: x \in \mathbb{R}^n, \Vert x\Vert  = 1\} = \{A \in \mathbb{S}^n_+: \text{tr}(A) = 1\}</span>.</p></li>
+<li><p>[8 points] Show, that <span class="math inline">\mathbf{conv}\{xx^\top: x \in \mathbb{R}^n, \Vert x\Vert  = 1\} = \{A \in \mathbb{S}^n_+: \text{tr}(A) = 1\}</span>.</p></li>
 <li><p>[5 points] Prove that the set of <span class="math inline">\{x \in \mathbb{R}^2 \mid e^{x_1}\le x_2\}</span> is convex.</p></li>
-<li><p>[10 points] Consider the function <span class="math inline">f(x) = x^d</span>, where <span class="math inline">x \in \mathbb{R}_{+}</span>. Fill the following table with ✅ or ❎. Explain your answers</p>
+<li><p>[8 points] Consider the function <span class="math inline">f(x) = x^d</span>, where <span class="math inline">x \in \mathbb{R}_{+}</span>. Fill the following table with ✅ or ❎. Explain your answers (with proofs).</p>
 <div class="table-responsive">
 <table class="caption-top table">
 <thead>
@@ -673,14 +673,14 @@ x_c = \frac{\sum_{i=1}^k m_i x_i}{\sum_{i=1}^k m_i}
 </tbody>
 </table>
 </div></li>
-<li><p>[10 points] Prove that the entropy function, defined as <span class="math display">
+<li><p>[6 points] Prove that the entropy function, defined as <span class="math display">
 f(x) = -\sum_{i=1}^n x_i \log(x_i),
 </span> with <span class="math inline">\text{dom}(f) = \{x \in \R^n_{++} : \sum_{i=1}^n x_i = 1\}</span>, is strictly concave.</p></li>
-<li><p>[10 points] Show that the maximum of a convex function <span class="math inline">f</span> over the polyhedron <span class="math inline">P = \text{conv}\{v_1, \ldots, v_k\}</span> is achieved at one of its vertices, i.e., <span class="math display">
+<li><p>[8 points] Show that the maximum of a convex function <span class="math inline">f</span> over the polyhedron <span class="math inline">P = \text{conv}\{v_1, \ldots, v_k\}</span> is achieved at one of its vertices, i.e., <span class="math display">
 \sup_{x \in P} f(x) = \max_{i=1, \ldots, k} f(v_i).
 </span></p>
 <p>A stronger statement is: the maximum of a convex function over a closed bounded convex set is achieved at an extreme point, i.e., a point in the set that is not a convex combination of any other points in the set. (you do not have to prove it). <em>Hint:</em> Assume the statement is false, and use Jensen’s inequality.</p></li>
-<li><p>[10 points] Show, that the two definitions of <span class="math inline">\mu</span>-strongly convex functions are equivalent:</p>
+<li><p>[6 points] Show, that the two definitions of <span class="math inline">\mu</span>-strongly convex functions are equivalent:</p>
 <ol type="1">
 <li><p><span class="math inline">f(x)</span> is <span class="math inline">\mu</span>-strongly convex <span class="math inline">\iff</span> for any <span class="math inline">x_1, x_2 \in S</span> and <span class="math inline">0 \le \lambda \le 1</span> for some <span class="math inline">\mu &gt; 0</span>: <span class="math display">
 f(\lambda x_1 + (1 - \lambda)x_2) \le \lambda f(x_1) + (1 - \lambda)f(x_2) - \frac{\mu}{2} \lambda (1 - \lambda)\|x_1 - x_2\|^2
