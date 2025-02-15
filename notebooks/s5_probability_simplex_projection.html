@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -114,9 +148,15 @@ window.Quarto = {
 
 <meta property="og:title" content="Probability simplex projection">
 <meta property="og:description" content="">
+<meta property="og:image" content="https://hse25.fmin.xyz/notebooks/s5_probability_simplex_projection_files/figure-html/cell-5-output-2.png">
+<meta property="og:image:height" content="470">
+<meta property="og:image:width" content="691">
 <meta name="twitter:title" content="Probability simplex projection">
 <meta name="twitter:description" content="">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hse25.fmin.xyz/notebooks/s5_probability_simplex_projection_files/figure-html/cell-5-output-2.png">
+<meta name="twitter:image-height" content="470">
+<meta name="twitter:image-width" content="691">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 
 <body class="nav-fixed fullcontent">
@@ -169,7 +209,226 @@ window.Quarto = {
 </header>
 
 
+<div id="cell-2" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <p>Here we can find implementaton of the 1st <span class="math inline">\mathcal{O}(n \log n)</span> algorithm, using Quicksort:</p>
+<div id="cell-4" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> project_simplex_sort(y):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Projects the vector y onto the unit simplex {x &gt;= 0, sum(x) = 1}.</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Difficulty: O(n log n).</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> np.asarray(y, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="bu">len</span>(y)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If the sum is already &lt;= 1 and all coordinates are non-negative,</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># then this is already a point on the simplex (you need to check).</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># But the classics usually assume sum(y) &gt;= 1, </span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># nevertheless, we will add protection:</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.<span class="bu">all</span>(y <span class="op">&gt;=</span> <span class="dv">0</span>) <span class="kw">and</span> np.<span class="bu">abs</span>(y.<span class="bu">sum</span>() <span class="op">-</span> <span class="fl">1.0</span>) <span class="op">&lt;</span> <span class="fl">1e-12</span>:</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> y.copy()</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Sort in descending order</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    y_sorted <span class="op">=</span> np.sort(y)[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    y_cumsum <span class="op">=</span> np.cumsum(y_sorted)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Finding rho</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># We are looking for the largest k for which y_sorted[k] - (cumsum[k]-1)/(k+1) &gt; 0</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    rho <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        val <span class="op">=</span> y_sorted[k] <span class="op">-</span> (y_cumsum[k] <span class="op">-</span> <span class="fl">1.0</span>)<span class="op">/</span>(k <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> val <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>            rho <span class="op">=</span> k <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Counting the theta threshold</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    theta <span class="op">=</span> (y_cumsum[rho <span class="op">-</span> <span class="dv">1</span>] <span class="op">-</span> <span class="fl">1.0</span>) <span class="op">/</span> rho</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Building x</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.maximum(y <span class="op">-</span> theta, <span class="fl">0.0</span>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And here we can find an implementation of an algorithm of average complexity <span class="math inline">\mathcal{O}(n)</span>, but in the worst case <span class="math inline">\mathcal{O}(n^2)</span>. The idea is that we consistently (as a recursive or iterative approach) search for the “pivot” threshold so that about half of the elements end up on one side of the threshold. Due to randomization, the average work time is obtained <span class="math inline">\mathcal{O}(n)</span>:</p>
+<div id="cell-6" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> project_simplex_linear(y):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Projects the vector y onto the unit simplex,</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">    using the idea of a quick pivot selection.</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Average difficulty: O(n).</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> np.asarray(y, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="bu">len</span>(y)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If the sum is not more than 1 and y &gt;= 0, then it is already in the simplex</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.<span class="bu">all</span>(y <span class="op">&gt;=</span> <span class="dv">0</span>) <span class="kw">and</span> y.<span class="bu">sum</span>() <span class="op">&lt;=</span> <span class="fl">1.0</span>:</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> y.copy()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Auxiliary function for recursive search</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> find_pivot_and_sum(indices, current_sum, current_count):</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> indices:</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> current_sum, current_count, [], <span class="va">True</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Randomly choosing the index for the pivot</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        pivot_idx <span class="op">=</span> random.choice(indices)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        pivot_val <span class="op">=</span> y[pivot_idx]</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Dividing the elements into &gt;= pivot and &lt; pivot</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        bigger <span class="op">=</span> []</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        smaller <span class="op">=</span> []</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        sum_bigger <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> idx <span class="kw">in</span> indices:</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>            val <span class="op">=</span> y[idx]</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> val <span class="op">&gt;=</span> pivot_val:</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>                bigger.append(idx)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>                sum_bigger <span class="op">+=</span> val</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>                smaller.append(idx)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Checking to see if we have reached the condition</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        <span class="co"># sum_{waltz&gt;= pivot_val} (val - pivot_val) &lt; 1 ?</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Considering that we already have current_sum/current_count</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        new_sum <span class="op">=</span> current_sum <span class="op">+</span> sum_bigger</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>        new_count <span class="op">=</span> current_count <span class="op">+</span> <span class="bu">len</span>(bigger)</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Condition: sum_{v&gt;= pivot} (pivot) = new_sum - new_count * pivot</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Compare with 1</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (new_sum <span class="op">-</span> new_count <span class="op">*</span> pivot_val) <span class="op">&lt;</span> <span class="fl">1.0</span>:</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>            <span class="co"># So pivot_val can still be (or higher)</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>            <span class="co"># -&gt; moving towards the "smaller ones" (where we can raise the pivot)</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> (new_sum, new_count, smaller, <span class="va">False</span>)</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>            <span class="co"># pivot_val is too big, we need to go to the "big ones",</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>            <span class="co"># i.e. those that are exactly &gt;= pivot, we stay with them</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>            <span class="co"># (which may be even higher than the actual threshold).</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>            <span class="co"># But pivot_idx itself is also being removed from the proceedings. </span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>            <span class="co"># (since we know for sure that pivot_val &lt; the true threshold).</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> pivot_idx <span class="kw">in</span> bigger:</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>                bigger.remove(pivot_idx)</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>                new_sum <span class="op">-=</span> pivot_val</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>                new_count <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> (current_sum, current_count, bigger, <span class="va">False</span>)</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    indices <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(n))</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> <span class="fl">0.0</span>    </span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    c <span class="op">=</span> <span class="dv">0</span>      </span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> indices:</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>        s, c, indices, done <span class="op">=</span> find_pivot_and_sum(indices, s, c)</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> done:</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>    <span class="co"># When finished, we have "rho =c" and "sum =s"</span></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    <span class="co"># theta = (s - 1)/c</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>    theta <span class="op">=</span> (s <span class="op">-</span> <span class="fl">1.0</span>)<span class="op">/</span>c</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.maximum(y <span class="op">-</span> theta, <span class="dv">0</span>)</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s generate several large-dimensional vectors (for example, from <span class="math inline">10.000</span> to <span class="math inline">500.000</span>) and measure the running time of both simplex projection algorithms:</p>
+<div id="cell-8" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> check_projection_simplex(x, tol<span class="op">=</span><span class="fl">1e-9</span>):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Проверяет, что x проецирован на единичный симплекс:</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">    1) x_i &gt;= 0 для всех i</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">    2) sum(x_i) ~ 1 (с некоторой точностью)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (x <span class="op">&lt;</span> <span class="op">-</span>tol).<span class="bu">any</span>():</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> x.<span class="bu">sum</span>()</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">abs</span>(s <span class="op">-</span> <span class="fl">1.0</span>) <span class="op">&lt;</span> tol</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> generate_dims(start, stop, step):</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.arange(start, stop <span class="op">+</span> step, step).tolist()</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>dims <span class="op">=</span> generate_dims(<span class="dv">10_000</span>, <span class="dv">1_950_000</span>, <span class="dv">50_000</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>times_sort <span class="op">=</span> []</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>times_linear <span class="op">=</span> []</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> d <span class="kw">in</span> dims:</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> np.random.rand(d) <span class="op">*</span> <span class="fl">2.0</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> time.perf_counter()</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    x_sort <span class="op">=</span> project_simplex_sort(y)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    t_sort <span class="op">=</span> time.perf_counter() <span class="op">-</span> start</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> time.perf_counter()</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    x_lin <span class="op">=</span> project_simplex_linear(y)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    t_lin <span class="op">=</span> time.perf_counter() <span class="op">-</span> start</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    times_sort.append(t_sort)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    times_linear.append(t_lin)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> check_projection_simplex(x_sort), <span class="st">"Sort-based projection incorrect!"</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> check_projection_simplex(x_lin),  <span class="st">"Linear-based projection incorrect!"</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"dim=</span><span class="sc">{</span>d<span class="sc">}</span><span class="ss">, time_sort=</span><span class="sc">{</span>t_sort<span class="sc">:.4f}</span><span class="ss">s, time_lin=</span><span class="sc">{</span>t_lin<span class="sc">:.4f}</span><span class="ss">s"</span>)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Построим графики</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>plt.plot(dims, times_sort, <span class="st">'o--'</span>, label<span class="op">=</span><span class="st">'Sort-based O(n log n)'</span>)</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>plt.plot(dims, times_linear, <span class="st">'o--'</span>, label<span class="op">=</span><span class="st">'Quickselect-based O(n) (avg)'</span>)</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Dimension n'</span>)</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Time (s)'</span>)</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Comparison of projection time on a simplex (Sort vs Quickselect)'</span>)</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>dim=10000, time_sort=0.0037s, time_lin=0.0033s
+dim=60000, time_sort=0.0153s, time_lin=0.0085s
+dim=110000, time_sort=0.0227s, time_lin=0.0115s
+dim=160000, time_sort=0.0325s, time_lin=0.0303s
+dim=210000, time_sort=0.0428s, time_lin=0.0373s
+dim=260000, time_sort=0.0510s, time_lin=0.0434s
+dim=310000, time_sort=0.0610s, time_lin=0.0210s
+dim=360000, time_sort=0.0708s, time_lin=0.0269s
+dim=410000, time_sort=0.0802s, time_lin=0.0416s
+dim=460000, time_sort=0.0919s, time_lin=0.0506s
+dim=510000, time_sort=0.0997s, time_lin=0.0847s
+dim=560000, time_sort=0.1141s, time_lin=0.0397s
+dim=610000, time_sort=0.1240s, time_lin=0.1871s
+dim=660000, time_sort=0.1349s, time_lin=0.0911s
+dim=710000, time_sort=0.1449s, time_lin=0.1910s
+dim=760000, time_sort=0.1525s, time_lin=0.1030s
+dim=810000, time_sort=0.1680s, time_lin=0.0513s
+dim=860000, time_sort=0.1702s, time_lin=0.1326s
+dim=910000, time_sort=0.1824s, time_lin=0.1944s
+dim=960000, time_sort=0.1931s, time_lin=0.1624s
+dim=1010000, time_sort=0.2021s, time_lin=0.1996s
+dim=1060000, time_sort=0.2140s, time_lin=0.1413s
+dim=1110000, time_sort=0.2287s, time_lin=0.1847s
+dim=1160000, time_sort=0.2557s, time_lin=0.2943s
+dim=1210000, time_sort=0.2475s, time_lin=0.2495s
+dim=1260000, time_sort=0.2578s, time_lin=0.2290s
+dim=1310000, time_sort=0.2626s, time_lin=0.1429s
+dim=1360000, time_sort=0.2762s, time_lin=0.2241s
+dim=1410000, time_sort=0.2805s, time_lin=0.2289s
+dim=1460000, time_sort=0.2921s, time_lin=0.1103s
+dim=1510000, time_sort=0.3057s, time_lin=0.1602s
+dim=1560000, time_sort=0.3176s, time_lin=0.2236s
+dim=1610000, time_sort=0.3205s, time_lin=0.2146s
+dim=1660000, time_sort=0.3392s, time_lin=0.3725s
+dim=1710000, time_sort=0.3442s, time_lin=0.2719s
+dim=1760000, time_sort=0.3570s, time_lin=0.3431s
+dim=1810000, time_sort=0.3645s, time_lin=0.1760s
+dim=1860000, time_sort=0.3777s, time_lin=0.1566s
+dim=1910000, time_sort=0.4000s, time_lin=0.2485s
+dim=1960000, time_sort=0.4205s, time_lin=0.1840s</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="s5_probability_simplex_projection_files/figure-html/cell-5-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Thus, we see that the second algorithm is always superior to the first one on average, but in some few cases the first one is superior to the second one. Apparently, in these cases, the most “inconvenient” cases for the second algorithm are implemented.</p>
 
 
 
