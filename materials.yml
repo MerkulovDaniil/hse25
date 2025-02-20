@@ -35,8 +35,8 @@
   materials: /lectures/5.pdf
   notes: /notes/5.pdf
   seminar: /seminars/5.pdf
-  youtube:
-  download:
+  youtube: https://youtu.be/ibYUeSq-zkQ
+  download: https://disk.yandex.ru/i/y6fIdxfpzjgmxA
 
 - title: Двойственность.
   number: 6
