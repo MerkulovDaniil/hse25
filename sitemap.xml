@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://hse25.fmin.xyz/homework.html</loc>
-    <lastmod>2025-02-17T11:55:37.304Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/notebooks/s2_brent.html</loc>
-    <lastmod>2025-02-17T11:55:37.306Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/notebooks/s5_probability_simplex_projection.html</loc>
-    <lastmod>2025-02-17T11:55:37.309Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/notebooks/s1_lora_trump.html</loc>
-    <lastmod>2025-02-17T11:55:37.306Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/notebooks/s4_benchmarx_convex.html</loc>
-    <lastmod>2025-02-17T11:55:37.309Z</lastmod>
+    <loc>https://hse25.fmin.xyz/index.html</loc>
+    <lastmod>2025-02-20T16:58:40.508Z</lastmod>
   </url>
   <url>
     <loc>https://hse25.fmin.xyz/program.html</loc>
-    <lastmod>2025-02-17T11:55:37.590Z</lastmod>
+    <lastmod>2025-02-20T16:58:40.794Z</lastmod>
   </url>
   <url>
-    <loc>https://hse25.fmin.xyz/index.html</loc>
-    <lastmod>2025-02-17T11:55:37.304Z</lastmod>
+    <loc>https://hse25.fmin.xyz/notebooks/s4_benchmarx_convex.html</loc>
+    <lastmod>2025-02-20T16:58:40.514Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/notebooks/s1_lora_trump.html</loc>
+    <lastmod>2025-02-20T16:58:40.510Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/notebooks/s5_probability_simplex_projection.html</loc>
+    <lastmod>2025-02-20T16:58:40.514Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/notebooks/s2_brent.html</loc>
+    <lastmod>2025-02-20T16:58:40.511Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/homework.html</loc>
+    <lastmod>2025-02-20T16:58:40.508Z</lastmod>
   </url>
 </urlset>
