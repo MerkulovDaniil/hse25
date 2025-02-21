@@ -49,10 +49,13 @@ toc: true
      y^{(1)} & \dots & y^{(m)} \\
      | & & | \\
     \end{pmatrix},\\
-    y^{(i)} &:= \frac{x^{(i)} - \frac{1}{m}\sum_{j=1}^{m} x^{(j)}}{\sqrt{\frac{1}{m}\sum_{j=1}^{m} \left(x^{(j)}\right)^2 - \left(\frac{1}{m}\sum_{j=1}^{m} x^{(j)}\right)^2}}.
+    y^{(i)} &:= \frac{x^{(i)} - \frac{1}{m}\sum_{j=1}^{m} x^{(j)}}{\sigma}.
     \end{split}
     $$
-    What is the rank of $Y$ if $\text{rank} \; X = r$?
+    What is the rank of $Y$ if $\text{rank} \; X = r$? Here $\sigma$ is a vector and the division is element-wise. The reason for this is that different features might have different scales. Specifically:
+    $$
+    \sigma_i = \sqrt{\frac{1}{m}\sum_{j=1}^{m} \left(x_i^{(j)}\right)^2 - \left(\frac{1}{m}\sum_{j=1}^{m} x_i^{(j)}\right)^2}.
+    $$
 
 1. [20 points] **Image Compression with Truncated SVD** Explore image compression using Truncated Singular Value Decomposition (SVD). Understand how varying the number of singular values affects the quality of the compressed image.
     Implement a Python script to compress a grayscale image using Truncated SVD and visualize the compression quality.
@@ -180,7 +183,7 @@ toc: true
 
 ### Line search
 
-1. [10 points] Consider a quadratic function $f: \mathbb{R}^n \rightarrow \mathbb{R}$, and let us start from a point $x_k \in \mathbb{R}^n$ moving in the direction of the antigradient $-\nabla f(x_k)$, note that $\nabla f(x_k)\neq 0$. Show that the minimum of $f$ along this direction as a function of the step size $\alpha$, for a decreasing function at $x_k$, satisfies Armijo's condition for any $c_1$ in the range $0 \leq c_1 \leq \frac{1}{2}$. Specifically, demonstrate that the following inequality holds at the optimal $\alpha^*$:
+1. [10 points] Consider a strongly convex quadratic function $f: \mathbb{R}^n \rightarrow \mathbb{R}$, and let us start from a point $x_k \in \mathbb{R}^n$ moving in the direction of the antigradient $-\nabla f(x_k)$, note that $\nabla f(x_k)\neq 0$. Show that the minimum of $f$ along this direction as a function of the step size $\alpha$, for a decreasing function at $x_k$, satisfies Armijo's condition for any $c_1$ in the range $0 \leq c_1 \leq \frac{1}{2}$. Specifically, demonstrate that the following inequality holds at the optimal $\alpha^*$:
     $$
     \varphi(\alpha) = f(x_{k+1}) = f(x_k - \alpha \nabla f(x_k)) \leq f(x_k) - c_1 \alpha \|\nabla f(x_k)\|_2^2
     $$
@@ -480,3 +483,249 @@ toc: true
         $$
 
     1. $f(x)$ is $\mu$-strongly convex $\iff$ if there exists $\mu>0$ such that the function $f(x) - \dfrac{\mu}{2}\Vert x\Vert^2$ is convex.
+
+### Optimality conditions. KKT. Duality
+
+In this section, you can consider either the arbitrary norm or the Euclidian norm if nothing else is specified.
+
+1. **Toy example** [10 points] 
+    $$
+    \begin{split}
+    & x^2 + 1 \to \min\limits_{x \in \mathbb{R} }\\
+    \text{s.t. } & (x-2)(x-4) \leq 0
+    \end{split}
+    $$
+
+    1. Give the feasible set, the optimal value, and the optimal solution.
+    1.  Plot the objective $x^2 +1$ versus $x$. On the same plot, show the feasible set, optimal point, and value, and plot the Lagrangian $L(x,\mu)$ versus $x$ for a few positive values of $\mu$. Verify the lower bound property ($p^* \geq \inf_x L(x, \mu)$for $\mu \geq 0$). Derive and sketch the Lagrange dual function $g$.
+    1. State the dual problem, and verify that it is a concave maximization problem. Find the dual optimal value and dual optimal solution $\mu^*$. Does strong duality hold?
+    1.  Let $p^*(u)$ denote the optimal value of the problem
+
+    $$
+    \begin{split}
+    & x^2 + 1 \to \min\limits_{x \in \mathbb{R} }\\
+    \text{s.t. } & (x-2)(x-4) \leq u
+    \end{split}
+    $$
+
+    as a function of the parameter $u$. Plot $p^*(u)$. Verify that $\dfrac{dp^*(0)}{du} = -\mu^*$ 
+
+1. Consider a smooth convex function $f(x)$ at some point $x_k$. One can define the first-order Taylor expansion of the function as:
+    $$
+    f^I_{x_k}(x) = f(x_k) + \nabla f(x_k)^\top (x - x_k),
+    $$
+    where we can define $\delta x = x - x_k$ and $g = \nabla f(x_k)$. Thus, the expansion can be rewritten as:
+    $$
+    f^I_{x_k}(\delta x) = f(x_k) + g^\top \delta x.
+    $$
+    Suppose, we would like to design the family of optimization methods that will be defined as:
+    $$
+    x_{k+1} = \text{arg}\min_{\delta x} \left\{f^I_{x_k}(\delta x) + \frac{\lambda}{2} \|\delta x\|^2\right\},
+    $$
+    where $\lambda > 0$ is a parameter.
+
+    1. [5 points] Show, that this method is equivalent to the gradient descent method with the choice of Euclidean norm of the vector $\|\delta x\| = \|\delta x\|_2$. Find the corresponding learning rate.
+    1. [5 points] Prove, that the following holds:
+        $$
+        \text{arg}\min_{\delta x \in \mathbb{R}^n} \left\{ g^T\delta x + \frac{\lambda}{2} \|\delta x\|^2\right\} = - \frac{\|g\|_*}{\lambda} \text{arg}\max_{\|t\|=1} \left\{ t^T g \right\},
+        $$
+        where $\|g\|_*$ is the [dual norm](https://fmin.xyz/docs/theory/Dual%20norm.html) of $g$.
+    1. [3 points] Consider another vector norm $\|\delta x\| = \|\delta x\|_\infty$. Write down exact expression for the corresponding method.
+    1. [2 points] Consider induced operator matrix norm for any matrix $W \in \mathbb{R}^{d_{out} \times d_{in}}$
+        $$
+        \|W\|_{\alpha \to \beta} = \max_{x \in \mathbb{R}^{d_{in}}} \frac{\|Wx\|_{\beta}}{\|x\|_{\alpha}}.
+        $$
+        Typically, when we solve optimization problems in deep learning, we stack the weight matrices for all layers $l = [1, L]$ into a single vector.
+        $$
+        w = \text{vec}(W_1, W_2, \ldots, W_L) \in \mathbb{R}^{n},
+        $$
+        Can you write down the exact expression, that relates
+        $$
+        \|w\|_\infty \qquad \text{ and } \qquad \|W_l\|_{\alpha \to \beta}, \; l = [1, L]?
+        $$
+
+1. [10 points] Derive the dual problem for the Ridge regression problem with $A \in \mathbb{R}^{m \times n}, b \in \mathbb{R}^m, \lambda > 0$:
+
+    $$
+    \begin{split}
+    \dfrac{1}{2}\|y-b\|^2 + \dfrac{\lambda}{2}\|x\|^2 &\to \min\limits_{x \in \mathbb{R}^n, y \in \mathbb{R}^m }\\
+    \text{s.t. } & y = Ax
+    \end{split}
+    $$
+
+1. [20 points] Derive the dual problem for the support vector machine problem with $A \in \mathbb{R}^{m \times n}, \mathbf{1} \in \mathbb{R}^m \in \mathbb{R}^m, \lambda > 0$:
+
+    $$
+    \begin{split}
+    \langle \mathbf{1}, t\rangle + \dfrac{\lambda}{2}\|x\|^2 &\to \min\limits_{x \in \mathbb{R}^n, t \in \mathbb{R}^m }\\
+    \text{s.t. } & Ax \succeq \mathbf{1} - t \\
+    & t \succeq 0
+    \end{split}
+    $$
+
+1. [10 points] Give an explicit solution to the following LP.
+    
+    $$
+    \begin{split}
+    & c^\top x \to \min\limits_{x \in \mathbb{R}^n }\\
+    \text{s.t. } & 1^\top x = 1, \\
+    & x \succeq 0 
+    \end{split}
+    $$
+
+    This problem can be considered the simplest portfolio optimization problem.
+
+1. [20 points] Show, that the following problem has a unique solution and find it:
+
+    $$
+    \begin{split}
+    & \langle C^{-1}, X\rangle - \log \det X \to \min\limits_{x \in \mathbb{R}^{n \times n} }\\
+    \text{s.t. } & \langle Xa, a\rangle \leq 1,
+    \end{split}
+    $$
+
+    where $C \in \mathbb{S}^n_{++}, a \in \mathbb{R}^n \neq 0$. The answer should not involve inversion of the matrix $C$.
+
+1. [20 points] Give an explicit solution to the following QP.
+    
+    $$
+    \begin{split}
+    & c^\top x \to \min\limits_{x \in \mathbb{R}^n }\\
+    \text{s.t. } & (x - x_c)^\top A (x - x_c) \leq 1,
+    \end{split}
+    $$
+
+    where $A \in \mathbb{S}^n_{++}, c \neq 0, x_c \in \mathbb{R}^n$.
+
+1. [10 points] Consider the equality-constrained least-squares problem
+    
+    $$
+    \begin{split}
+    & \|Ax - b\|_2^2 \to \min\limits_{x \in \mathbb{R}^n }\\
+    \text{s.t. } & Cx = d,
+    \end{split}
+    $$
+
+    where $A \in \mathbb{R}^{m \times n}$ with $\mathbf{rank }A = n$, and $C \in \mathbb{R}^{k \times n}$ with $\mathbf{rank }C = k$. Give the KKT conditions, and derive expressions for the primal solution $x^*$ and the dual solution $\lambda^*$.
+
+
+
+1. **Supporting hyperplane interpretation of KKT conditions**. [10 points]  Consider a **convex** problem with no equality constraints
+    
+    $$
+    \begin{split}
+    & f_0(x) \to \min\limits_{x \in \mathbb{R}^n }\\
+    \text{s.t. } & f_i(x) \leq 0, \quad i = [1,m]
+    \end{split}
+    $$
+
+    Assume, that $\exists x^* \in \mathbb{R}^n, \mu^* \in \mathbb{R}^m$ satisfy the KKT conditions
+    
+    $$
+    \begin{split}
+    & \nabla_x L (x^*, \mu^*) = \nabla f_0(x^*) + \sum\limits_{i=1}^m\mu_i^*\nabla f_i(x^*) = 0 \\
+    & \mu^*_i \geq 0, \quad i = [1,m] \\
+    & \mu^*_i f_i(x^*) = 0, \quad i = [1,m]\\
+    & f_i(x^*) \leq 0, \quad i = [1,m]
+    \end{split}
+    $$
+
+    Show that
+
+    $$
+    \nabla f_0(x^*)^\top (x - x^*) \geq 0
+    $$
+
+    for all feasible $x$. In other words, the KKT conditions imply the simple optimality criterion or $\nabla f_0(x^*)$ defines a supporting hyperplane to the feasible set at $x^*$.
+    
+1. **A penalty method for equality constraints.** [10 points] We consider the problem of minimization
+
+    $$
+    \begin{split}
+    & f_0(x) \to \min\limits_{x \in \mathbb{R}^{n} }\\
+    \text{s.t. } & Ax = b,
+    \end{split}
+    $$
+    
+    where $f_0(x): \mathbb{R}^n \to\mathbb{R} $ is convex and differentiable, and $A \in \mathbb{R}^{m \times n}$ with $\mathbf{rank }A = m$. In a quadratic penalty method, we form an auxiliary function
+
+    $$
+    \phi(x) = f_0(x) + \alpha \|Ax - b\|_2^2,
+    $$
+    
+    where $\alpha > 0$ is a parameter. This auxiliary function consists of the objective plus the penalty term $\alpha \Vert Ax - b\Vert_2^2$. The idea is that a minimizer of the auxiliary function, $\tilde{x}$, should be an approximate solution to the original problem. Intuition suggests that the larger the penalty weight $\alpha$, the better the approximation $\tilde{x}$ to a solution of the original problem. Suppose $\tilde{x}$ is a minimizer of $\phi(x)$. Show how to find, from $\tilde{x}$, a dual feasible point for the original problem. Find the corresponding lower bound on the optimal value of the original problem.
+
+### Linear programming
+
+1. **📱🎧💻 Covers manufacturing.** [20 points] Lyzard Corp is producing covers for the following products: 
+    * 📱 phones
+    * 🎧 headphones
+    * 💻 laptops
+
+    The company’s production facilities are such that if we devote the entire production to headphone covers, we can produce 5000 of them in one day. If we devote the entire production to phone covers or laptop covers, we can produce 4000 or 2000 of them in one day. 
+
+    The production schedule is one week (6 working days), and the week’s production must be stored before distribution. Storing 1000 headphone covers (packaging included) takes up 30 cubic feet of space. Storing 1000 phone covers (packaging included) takes up 50 cubic feet of space, and storing 1000 laptop covers (packaging included) takes up 200 cubic feet of space. The total storage space available is 1500 cubic feet. 
+    
+    Due to commercial agreements with Lyzard Corp has to deliver at least 6000 headphone covers and 4000 laptop covers per week to strengthen the product’s diffusion. 
+
+    The marketing department estimates that the weekly demand for headphones covers, phone, and laptop covers does not exceed 15000, 12000 and 8000 units, therefore the company does not want to produce more than these amounts for headphones, phone, and laptop covers. 
+
+    Finally, the net profit per headphone cover, phone cover, and laptop cover are \$5, \$7, and \$12, respectively.
+
+    The aim is to determine a weekly production schedule that maximizes the total net profit.
+
+    1. Write a Linear Programming formulation for the problem.  Use the following variables:
+
+        * $y_1$ = number of headphones covers produced over the week,  
+        * $y_2$ = number of phone covers produced over the week,  
+        * $y_3$ = number of laptop covers produced over the week. 
+
+    1. Find the solution to the problem using [PyOMO](http://www.pyomo.org)
+    
+        ```python
+        !pip install pyomo
+        ! sudo apt-get install glpk-utils --quiet  # GLPK
+        ! sudo apt-get install coinor-cbc --quiet  # CoinOR
+        ```
+
+    1. Perform the sensitivity analysis. Which constraint could be relaxed to increase the profit the most? Prove it numerically.
+
+1. Prove the optimality of the solution [10 points] 
+    
+    $$
+    x = \left(\frac{7}{3} , 0, \frac{1}{3}\right)^T
+    $$
+    
+    to the following linear programming problem:
+    
+    $$
+    \begin{split}
+    & 9x_1 + 3x_2 + 7x_3 \to \max\limits_{x \in \mathbb{R}^3 }\\
+    \text{s.t. } & 2x_1 + x_2 + 3x_3 \leq 6 \\
+    & 5x_1 + 4x_2 + x_3 \leq 12 \\
+    & 3x_3 \leq 1,\\
+    & x_1, x_2, x_3 \geq 0
+    \end{split}
+    $$
+
+    but you cannot use any numerical algorithm here.
+
+### Gradient Descent
+
+### Accelerated methods
+
+### Subgradient method
+
+### Conjugate gradients
+
+### Conditional gradient methods
+
+### Proximal gradient method
+
+### Newton and quasi-Newton methods
+
+### Stochastic gradient methods
+
+### Neural network training
+
+### Big models
