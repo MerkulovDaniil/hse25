@@ -59,8 +59,8 @@
   materials: /lectures/8.pdf
   notes: /notes/8.pdf
   seminar: /seminars/8.pdf
-  youtube:
-  download:
+  youtube: https://youtu.be/xmOhHuQbG4Y
+  download: https://disk.yandex.ru/i/jzOT_ssaum18YA
 
 - title: Ускоренные градиентные методы. Метод Поляка, Нестерова.
   number: 9
