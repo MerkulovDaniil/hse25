@@ -67,7 +67,7 @@
   materials: /lectures/9.pdf
   notes: /notes/9.pdf
   seminar: /seminars/9.pdf
-  youtube:
+  youtube: https://youtu.be/tE6YZ19pygQ
   download:
 
 - title: Субградиент. Субдифференциал. Субградиентный спуск. Теоремы сходимости в негладком случае. Особенности работы градиентного метода в практических негладких задачах.
