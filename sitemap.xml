@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://hse25.fmin.xyz/homework.html</loc>
-    <lastmod>2025-03-12T14:55:58.133Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/index.html</loc>
-    <lastmod>2025-03-12T14:55:58.133Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/notebooks/s5_probability_simplex_projection.html</loc>
-    <lastmod>2025-03-12T14:55:58.139Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/notebooks/s9_hobbit_village.html</loc>
-    <lastmod>2025-03-12T14:55:58.142Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/notebooks/s1_lora_trump.html</loc>
-    <lastmod>2025-03-12T14:55:58.136Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/notebooks/s2_brent.html</loc>
-    <lastmod>2025-03-12T14:55:58.136Z</lastmod>
-  </url>
-  <url>
-    <loc>https://hse25.fmin.xyz/notebooks/s4_benchmarx_convex.html</loc>
-    <lastmod>2025-03-12T14:55:58.139Z</lastmod>
+    <loc>https://hse25.fmin.xyz/program.html</loc>
+    <lastmod>2025-03-13T10:13:32.777Z</lastmod>
   </url>
   <url>
     <loc>https://hse25.fmin.xyz/notebooks/s9_agd_problems.html</loc>
-    <lastmod>2025-03-12T14:55:58.142Z</lastmod>
+    <lastmod>2025-03-13T10:13:32.201Z</lastmod>
   </url>
   <url>
-    <loc>https://hse25.fmin.xyz/program.html</loc>
-    <lastmod>2025-03-12T14:55:58.719Z</lastmod>
+    <loc>https://hse25.fmin.xyz/notebooks/s4_benchmarx_convex.html</loc>
+    <lastmod>2025-03-13T10:13:32.198Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/notebooks/s2_brent.html</loc>
+    <lastmod>2025-03-13T10:13:32.196Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/notebooks/s1_lora_trump.html</loc>
+    <lastmod>2025-03-13T10:13:32.195Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/notebooks/s9_hobbit_village.html</loc>
+    <lastmod>2025-03-13T10:13:32.201Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/notebooks/s5_probability_simplex_projection.html</loc>
+    <lastmod>2025-03-13T10:13:32.199Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/index.html</loc>
+    <lastmod>2025-03-13T10:13:32.192Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hse25.fmin.xyz/homework.html</loc>
+    <lastmod>2025-03-13T10:13:32.192Z</lastmod>
   </url>
 </urlset>
