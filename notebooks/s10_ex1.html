@@ -306,7 +306,7 @@ f(x)=\dfrac{1}{2}x^TAx-b^Tx\longrightarrow \min_{x\in\mathbb{R}^n}
 <span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> b <span class="op">-</span> np.dot(A, x)</span>
 <span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> r.copy()</span>
-<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>    values, gradients <span class="op">=</span> [f(x)], [np.linalg.norm(r)]</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>    values, gradients <span class="op">=</span> [f(x) <span class="op">-</span> f_opt], [np.linalg.norm(r)]</span>
 <span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(iterations <span class="op">-</span> <span class="dv">1</span>):</span>
 <span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>        <span class="co">## YOUR CODE HERE ##</span></span>
 <span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span>
