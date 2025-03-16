@@ -206,7 +206,7 @@ window.Quarto = {
 <p>How can such methods be applied to non-quadratic problems? For example, for binary logistic regression: <span class="math display">
 f(x)=\dfrac{\mu}{2}\| x \|^2_2 + \dfrac{1}{m}\sum_{i=1}^{m}log(1+exp(-y_i\langle a_i, x \rangle)) \longrightarrow \min_{x\in\mathbb{R}^n}
 </span></p>
-<p>We can use the Fletcher-Reeves or Polyak-Ribier method. Add the iteration in function <code>ConjugateGradientPR()</code> of the Polyak-Ribier method to the code:</p>
+<p>We can use the Fletcher-Reeves or Polak-Ribier method. Add the iteration in function <code>ConjugateGradientPR()</code> of the Polak-Ribier method to the code:</p>
 <div id="cell-3" class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
