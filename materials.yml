@@ -78,7 +78,7 @@
   youtube: https://youtu.be/RskBMw8SK84
   download: https://disk.yandex.com/i/c6jgSvtS3Z1fCw
 
-- title: Субградиент. Субдифференциал. Субградиентный спуск. Теоремы сходимости в негладком случае. Особенности работы градиентного метода в практических негладких задачах.
+- title: Метод Ньютона. Квазиньютоновские методы.
   number: 11
   materials: /lectures/11.pdf
   notes: /notes/11.pdf
@@ -94,7 +94,7 @@
   youtube:
   download:
 
-- title: Проксимальный градиентный метод.
+- title: Субградиент. Субдифференциал. Субградиентный спуск. Теоремы сходимости в негладком случае. Особенности работы градиентного метода в практических негладких задачах.
   number: 13
   materials: /lectures/13.pdf
   notes: /notes/13.pdf
@@ -102,7 +102,7 @@
   youtube:
   download:
 
-- title: Метод Ньютона. Квазиньютоновские методы.
+- title: Проксимальный градиентный метод.
   number: 14
   materials: /lectures/14.pdf
   notes: /notes/14.pdf
