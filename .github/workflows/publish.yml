@@ -17,8 +17,8 @@ jobs:
       
       - name: Install CMU Unicode Fonts Manually
         run: |
-          sudo apt-get update
-          sudo apt-get install fonts-cmu
+          brew install --cask font-cmu-serif
+          brew install --cask font-cmu-sans-serif
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
