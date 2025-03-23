@@ -733,19 +733,19 @@ f^I_{x_k}(x) = f(x_k) + \nabla f(x_k)^\top (x - x_k),
 </span> where we can define <span class="math inline">\delta x = x - x_k</span> and <span class="math inline">g = \nabla f(x_k)</span>. Thus, the expansion can be rewritten as: <span class="math display">
 f^I_{x_k}(\delta x) = f(x_k) + g^\top \delta x.
 </span> Suppose, we would like to design the family of optimization methods that will be defined as: <span class="math display">
-x_{k+1} = \text{arg}\min_{\delta x} \left\{f^I_{x_k}(\delta x) + \frac{\lambda}{2} \|\delta x\|^2\right\},
+x_{k+1} = \text{arg}\min_{x} \left\{f^I_{x_k}(\delta x) + \frac{\lambda}{2} \|\delta x\|^2\right\},
 </span> where <span class="math inline">\lambda &gt; 0</span> is a parameter.</p>
 <ol type="1">
 <li>[5 points] Show, that this method is equivalent to the gradient descent method with the choice of Euclidean norm of the vector <span class="math inline">\|\delta x\| = \|\delta x\|_2</span>. Find the corresponding learning rate.</li>
 <li>[5 points] Prove, that the following holds: <span class="math display">
 \text{arg}\min_{\delta x \in \mathbb{R}^n} \left\{ g^T\delta x + \frac{\lambda}{2} \|\delta x\|^2\right\} = - \frac{\|g\|_*}{\lambda} \text{arg}\max_{\|t\|=1} \left\{ t^T g \right\},
 </span> where <span class="math inline">\|g\|_*</span> is the <a href="https://fmin.xyz/docs/theory/Dual%20norm.html">dual norm</a> of <span class="math inline">g</span>.</li>
-<li>[3 points] Consider another vector norm <span class="math inline">\|\delta x\| = \|\delta x\|_\infty</span>. Write down exact expression for the corresponding method.</li>
+<li>[3 points] Consider another vector norm <span class="math inline">\|\delta x\| = \|\delta x\|_\infty</span>. Write down explicit expression for the corresponding method.</li>
 <li>[2 points] Consider induced operator matrix norm for any matrix <span class="math inline">W \in \mathbb{R}^{d_{out} \times d_{in}}</span> <span class="math display">
 \|W\|_{\alpha \to \beta} = \max_{x \in \mathbb{R}^{d_{in}}} \frac{\|Wx\|_{\beta}}{\|x\|_{\alpha}}.
 </span> Typically, when we solve optimization problems in deep learning, we stack the weight matrices for all layers <span class="math inline">l = [1, L]</span> into a single vector. <span class="math display">
 w = \text{vec}(W_1, W_2, \ldots, W_L) \in \mathbb{R}^{n},
-</span> Can you write down the exact expression, that relates <span class="math display">
+</span> Can you write down the explicit expression, that relates <span class="math display">
 \|w\|_\infty \qquad \text{ and } \qquad \|W_l\|_{\alpha \to \beta}, \; l = [1, L]?
 </span></li>
 </ol></li>
