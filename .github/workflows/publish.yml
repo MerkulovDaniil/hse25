@@ -7,7 +7,8 @@ name: Quarto Publish
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
+
     permissions:
       contents: write
 
@@ -17,8 +18,11 @@ jobs:
       
       - name: Install CMU Unicode Fonts Manually
         run: |
-          sudo apt-get update
-          sudo apt-get install fonts-cmu
+          curl -L -o cmu-fonts.zip https://downloads.sourceforge.net/project/cm-unicode/cm-unicode/0.7.0/cm-unicode-0.7.0-ttf.tar.xz
+          mkdir -p ~/Library/Fonts
+          tar -xf cmu-fonts.zip
+          find cm-unicode-* -name "*.ttf" -exec cp {} ~/Library/Fonts/ \;
+          fc-cache -f -v
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
