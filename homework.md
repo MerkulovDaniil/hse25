@@ -520,7 +520,7 @@ In this section, you can consider either the arbitrary norm or the Euclidian nor
     $$
     Suppose, we would like to design the family of optimization methods that will be defined as:
     $$
-    x_{k+1} = \text{arg}\min_{\delta x} \left\{f^I_{x_k}(\delta x) + \frac{\lambda}{2} \|\delta x\|^2\right\},
+    x_{k+1} = \text{arg}\min_{x} \left\{f^I_{x_k}(\delta x) + \frac{\lambda}{2} \|\delta x\|^2\right\},
     $$
     where $\lambda > 0$ is a parameter.
 
@@ -530,7 +530,7 @@ In this section, you can consider either the arbitrary norm or the Euclidian nor
         \text{arg}\min_{\delta x \in \mathbb{R}^n} \left\{ g^T\delta x + \frac{\lambda}{2} \|\delta x\|^2\right\} = - \frac{\|g\|_*}{\lambda} \text{arg}\max_{\|t\|=1} \left\{ t^T g \right\},
         $$
         where $\|g\|_*$ is the [dual norm](https://fmin.xyz/docs/theory/Dual%20norm.html) of $g$.
-    1. [3 points] Consider another vector norm $\|\delta x\| = \|\delta x\|_\infty$. Write down exact expression for the corresponding method.
+    1. [3 points] Consider another vector norm $\|\delta x\| = \|\delta x\|_\infty$. Write down explicit expression for the corresponding method.
     1. [2 points] Consider induced operator matrix norm for any matrix $W \in \mathbb{R}^{d_{out} \times d_{in}}$
         $$
         \|W\|_{\alpha \to \beta} = \max_{x \in \mathbb{R}^{d_{in}}} \frac{\|Wx\|_{\beta}}{\|x\|_{\alpha}}.
@@ -539,7 +539,7 @@ In this section, you can consider either the arbitrary norm or the Euclidian nor
         $$
         w = \text{vec}(W_1, W_2, \ldots, W_L) \in \mathbb{R}^{n},
         $$
-        Can you write down the exact expression, that relates
+        Can you write down the explicit expression, that relates
         $$
         \|w\|_\infty \qquad \text{ and } \qquad \|W_l\|_{\alpha \to \beta}, \; l = [1, L]?
         $$
