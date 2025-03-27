@@ -83,8 +83,8 @@
   materials: /lectures/11.pdf
   notes: /notes/11.pdf
   seminar: /seminars/11.pdf
-  youtube:
-  download:
+  youtube: https://youtu.be/hEiOdTru6Lc
+  download: https://disk.yandex.com/i/EI00JVRTmzoEJw
 
 - title: Градиентные методы в условных задачах оптимизации - метод проекции градиента. Метод Франк - Вульфа. Идея метода зеркального спуска.
   number: 12
