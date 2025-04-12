@@ -353,11 +353,11 @@ g(w) = \lambda w + \frac{1}{N} \sum_{i=1}^{N}
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    results[rule] <span class="op">=</span> (w_hist, loss_hist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Vizualization:</p>
-<div id="cell-14" class="cell" data-execution_count="27">
+<div id="cell-14" class="cell" data-execution_count="28">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule <span class="kw">in</span> strategies.keys():</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    loss_hist <span class="op">=</span> results[rule][<span class="dv">1</span>]</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    plt.plot(loss_hist, label<span class="op">=</span><span class="ss">f"Шаг: </span><span class="sc">{</span>rule<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    plt.plot(loss_hist, label<span class="op">=</span><span class="ss">f"Stepsize rule: </span><span class="sc">{</span>rule<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Iteration number"</span>)</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"L(w)"</span>)</span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Comparison of subgradient descent (SVM, hinge loss)</span><span class="ch">\n</span><span class="st"> with different steps"</span>)</span>
