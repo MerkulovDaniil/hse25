@@ -102,15 +102,58 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/copy-tex.min.js" integrity="sha384-ww/583aHhxWkz5DEVn6OKtNiIaLi2iBRNZXfJRiY1Ai7tnJ9UXpEsyvOITVpTl4A" crossorigin="anonymous"></script>
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <meta property="og:title" content="SVM with hinge loss and subdifferential descent">
 <meta property="og:description" content="">
-<meta property="og:image" content="https://hse25.fmin.xyz/notebooks/s13_svm_hingeloss_files/figure-html/cell-2-output-1.png">
+<meta property="og:image" content="https://hse25.fmin.xyz/notebooks/s13_svm_hingeloss_files/figure-html/cell-7-output-1.png">
 <meta property="og:image:height" content="476">
 <meta property="og:image:width" content="567">
 <meta name="twitter:title" content="SVM with hinge loss and subdifferential descent">
 <meta name="twitter:description" content="">
-<meta name="twitter:image" content="https://hse25.fmin.xyz/notebooks/s13_svm_hingeloss_files/figure-html/cell-2-output-1.png">
+<meta name="twitter:image" content="https://hse25.fmin.xyz/notebooks/s13_svm_hingeloss_files/figure-html/cell-7-output-1.png">
 <meta name="twitter:image-height" content="476">
 <meta name="twitter:image-width" content="567">
 <meta name="twitter:card" content="summary_large_image">
@@ -166,301 +209,199 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>import numpy as np import matplotlib.pyplot as plt</p>
-<section id="генерация-данных" class="level1">
-<h1>——————— 1. Генерация данных ———————</h1>
-<p>np.random.seed(42) N = 100 # число объектов X1 = np.random.randn(N//2, 2) + np.array([2, 2]) # смещаем один класс X2 = np.random.randn(N//2, 2) + np.array([-2, -2]) # смещаем другой класс</p>
-<p>X = np.vstack([X1, X2]) # матрица объекты x признаки y = np.hstack([np.ones(N//2), -np.ones(N//2)]) # метки классов: +1, -1</p>
-</section>
-<section id="перемешаем-всё-вместе-для-наглядности" class="level1">
-<h1>Перемешаем всё вместе для наглядности</h1>
-<p>perm = np.random.permutation(N) X = X[perm] y = y[perm]</p>
-</section>
-<section id="функция-потерь-объектив" class="level1">
-<h1>——————— 2. Функция потерь (объектив) ———————</h1>
-<p>def hinge_svm_objective(w, X, y, lambd): ““” Возвращает значение функционала: L(w) = (lambda/2)<em>||w||^2 + (1/N)</em>sum( max(0, 1 - y_i * w^T x_i) ). ““” # Считаем суммарное значение hinge loss по всем объектам margins = 1 - y * (X.dot(w)) hinge_losses = np.maximum(0, margins) return (lambd/2)*np.sum(w**2) + np.mean(hinge_losses)</p>
-</section>
-<section id="субградиент-функционала" class="level1">
-<h1>——————— 3. Субградиент функционала ———————</h1>
-<p>def hinge_svm_subgradient(w, X, y, lambd): ““” Возвращает субградиент g(w) для функционала: g(w) = lambda<em>w + (1/N)</em>sum( -y_i<em>x_i, если y_i</em>w^T x_i &lt; 1 ). ““” N = X.shape[0] margins = 1 - y * (X.dot(w))</p>
-<pre><code># Определяем, где слагаемое активно (hinge &gt; 0)
-active_mask = (margins &gt; 0).astype(float)
-
-# Считаем суммарный "градиент" для hinge-части
-# Для тех i, где margin&gt;0, добавляем -y_i*x_i
-grad_hinge = -(y * active_mask)[:, np.newaxis] * X
-
-# Усреднение по N
-grad_hinge = grad_hinge.mean(axis=0)
-
-# Итоговый субградиент
-g = lambd * w + grad_hinge
-return g</code></pre>
-</section>
-<section id="субградиентный-спуск" class="level1">
-<h1>——————— 4. Субградиентный спуск ———————</h1>
-<p>def subgradient_descent( X, y, lambd=0.01, max_iter=100, step_rule=‘constant’, c=1.0 ): ““” Субградиентный спуск для SVM с hinge loss: L(w) = (lambda/2)*||w||^2 + …</p>
-<pre><code>Параметры:
-  X, y     : выборка
-  lambd    : коэффициент регуляризации
-  max_iter : число итераций
-  step_rule: стратегия выбора шага ('constant', '1_over_k', '1_over_sqrt_k')
-  c        : константа для шага
-
-Возвращает:
-  w_history  : список векторов w на каждой итерации
-  loss_history: список значений функционала L(w) на каждой итерации
-"""
-w = np.zeros(X.shape[1])
-w_history = [w.copy()]
-loss_history = [hinge_svm_objective(w, X, y, lambd)]
-
-for k in range(1, max_iter+1):
-    g = hinge_svm_subgradient(w, X, y, lambd)
-    
-    # Выбираем шаг в зависимости от стратегии
-    if step_rule == 'constant':
-        alpha = c
-    elif step_rule == '1_over_k':
-        alpha = c / k
-    elif step_rule == '1_over_sqrt_k':
-        alpha = c / np.sqrt(k)
-    else:
-        raise ValueError("Неизвестная стратегия шага")
-    
-    w = w - alpha * g
-    
-    w_history.append(w.copy())
-    loss_history.append(hinge_svm_objective(w, X, y, lambd))
-
-return w_history, loss_history</code></pre>
-</section>
-<section id="запуск-эксперимента" class="level1">
-<h1>——————— 5. Запуск эксперимента ———————</h1>
-<p>max_iter = 50 lambd = 0.01 c = 1.0</p>
-<p>strategies = [‘constant’, ‘1_over_k’, ‘1_over_sqrt_k’] results = {}</p>
-<p>for s in strategies: w_hist, loss_hist = subgradient_descent( X, y, lambd=lambd, max_iter=max_iter, step_rule=s, c=c ) results[s] = (w_hist, loss_hist)</p>
-</section>
-<section id="графики" class="level1">
-<h1>——————— 6. Графики ———————</h1>
-</section>
-<section id="a-изменение-значения-функционала" class="level1">
-<h1>(a) Изменение значения функционала</h1>
-<p>plt.figure() for s in strategies: loss_hist = results[s][1] plt.plot(loss_hist, label=f”Шаг: {s}“) plt.xlabel(”Номер итерации”) plt.ylabel(“L(w)”) plt.title(“Сравнение субградиентного спускас hinge loss: значение функционала”) plt.legend() plt.show()</p>
-</section>
-<section id="b-разделяющие-прямые-для-каждого-подхода" class="level1">
-<h1>(b) Разделяющие прямые для каждого подхода</h1>
-</section>
-<section id="section" class="level1">
-<h1></h1>
-</section>
-<section id="для-2d-признаков-разделяющая-гиперплоскость-задаётся-уравнением" class="level1">
-<h1>Для 2D-признаков разделяющая гиперплоскость задаётся уравнением:</h1>
-</section>
-<section id="w0x-w1y-0-y--w0w1x" class="level1">
-<h1>w0<em>x + w1</em>y = 0 =&gt; y = -(w0/w1)*x</h1>
-</section>
-<section id="section-1" class="level1">
-<h1></h1>
-</section>
-<section id="построим-ее-на-сетке-для-финальных-w-каждого-подхода." class="level1">
-<h1>Построим ее на сетке для финальных w каждого подхода.</h1>
-<p>plt.figure() # Рисуем выборку plt.scatter(X[y==1, 0], X[y==1, 1], label=“Класс +1”) plt.scatter(X[y==-1, 0], X[y==-1, 1], label=“Класс -1”)</p>
-</section>
-<section id="координаты-для-отрисовки-прямых" class="level1">
-<h1>Координаты для отрисовки прямых</h1>
-<p>x_vals = np.linspace(X[:,0].min()-1, X[:,0].max()+1, 100)</p>
-<p>for s in strategies: w_final = results[s][0][-1] # последний w # Если w1=0, то разделяющая “прямая” вертикальна. Проверим на всякий случай: if abs(w_final[1]) &lt; 1e-10: # x = const x_const = -0.0 if abs(w_final[0])&lt;1e-10 else 0.0 # Если w_final[0] != 0, то уравнение w0<em>x + w1</em>y=0 =&gt; x=0. plt.plot([x_const, x_const], [X[:,1].min()-1, X[:,1].max()+1], label=f”Реш. прямая ({s})“) else: y_vals = -(w_final[0]/w_final[1]) * x_vals plt.plot(x_vals, y_vals, label=f”Реш. прямая ({s})“)</p>
-<p>plt.xlabel(“x1”) plt.ylabel(“x2”) plt.title(“Разделяющие прямые после 50 итераций субградиентного спуска”) plt.legend() plt.show()</p>
-<div id="cell-3" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------- 1. Генерация данных ---------------------</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">100</span>  <span class="co"># число объектов</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>X1 <span class="op">=</span> np.random.randn(N<span class="op">//</span><span class="dv">2</span>, <span class="dv">2</span>) <span class="op">+</span> np.array([<span class="dv">2</span>, <span class="dv">2</span>])   <span class="co"># смещаем один класс</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>X2 <span class="op">=</span> np.random.randn(N<span class="op">//</span><span class="dv">2</span>, <span class="dv">2</span>) <span class="op">+</span> np.array([<span class="op">-</span><span class="dv">2</span>, <span class="op">-</span><span class="dv">2</span>]) <span class="co"># смещаем другой класс</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.vstack([X1, X2])          <span class="co"># матрица объекты x признаки</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.hstack([np.ones(N<span class="op">//</span><span class="dv">2</span>), <span class="op">-</span>np.ones(N<span class="op">//</span><span class="dv">2</span>)])  <span class="co"># метки классов: +1, -1</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Перемешаем всё вместе для наглядности</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>perm <span class="op">=</span> np.random.permutation(N)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> X[perm]</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> y[perm]</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------- 2. Функция потерь (объектив) ---------------------</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hinge_svm_objective(w, X, y, lambd):</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co">    Возвращает значение функционала:</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co">      L(w) = (lambda/2)*||w||^2 + (1/N)*sum( max(0, 1 - y_i * w^T x_i) ).</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    margins <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> y <span class="op">*</span> (X.dot(w))</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    hinge_losses <span class="op">=</span> np.maximum(<span class="dv">0</span>, margins)</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (lambd<span class="op">/</span><span class="dv">2</span>)<span class="op">*</span>np.<span class="bu">sum</span>(w<span class="op">**</span><span class="dv">2</span>) <span class="op">+</span> np.mean(hinge_losses)</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------- 3. Субградиент функционала ---------------------</span></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hinge_svm_subgradient(w, X, y, lambd):</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="co">    Возвращает субградиент g(w) для:</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="co">      g(w) = lambda*w + (1/N)*sum( -y_i*x_i, если y_i*w^T x_i &lt; 1 ).</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> X.shape[<span class="dv">0</span>]</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    margins <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> y <span class="op">*</span> (X.dot(w))</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    active_mask <span class="op">=</span> (margins <span class="op">&gt;</span> <span class="dv">0</span>).astype(<span class="bu">float</span>)  <span class="co"># где hinge&gt;0</span></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Суммируем -y_i*x_i по всем активным (margin&gt;0)</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    grad_hinge <span class="op">=</span> <span class="op">-</span>(y <span class="op">*</span> active_mask)[:, np.newaxis] <span class="op">*</span> X</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    grad_hinge <span class="op">=</span> grad_hinge.mean(axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    g <span class="op">=</span> lambd<span class="op">*</span>w <span class="op">+</span> grad_hinge</span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> g</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------- 4. Субградиентный спуск ---------------------</span></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> subgradient_descent(</span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    X, y, lambd<span class="op">=</span><span class="fl">0.01</span>, </span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    max_iter<span class="op">=</span><span class="dv">150</span>, </span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    step_rule<span class="op">=</span><span class="st">'constant'</span>, </span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    c<span class="op">=</span><span class="fl">1.0</span>,</span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    f_star<span class="op">=</span><span class="fl">0.0</span></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="co">    Субградиентный спуск для SVM с hinge loss:</span></span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="co">    Параметры:</span></span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="co">      X, y       : выборка</span></span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="co">      lambd      : коэффициент регуляризации</span></span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="co">      max_iter   : число итераций</span></span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="co">      step_rule  : стратегия выбора шага:</span></span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="co">                     - 'constant'       -&gt; alpha_k = c</span></span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="co">                     - '1_over_k'       -&gt; alpha_k = c/k</span></span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a><span class="co">                     - '1_over_sqrt_k'  -&gt; alpha_k = c/sqrt(k)</span></span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="co">                     - 'polyak'         -&gt; alpha_k = (f(w_k) - f_star)/||g_k||^2</span></span>
-<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a><span class="co">      c          : константа для шага (используется во всех, кроме 'polyak')</span></span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a><span class="co">      f_star     : предполагаемый минимум (для 'polyak')</span></span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
-<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="co">    Возвращает:</span></span>
-<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="co">      w_history   : список векторов w на каждой итерации</span></span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a><span class="co">      loss_history: список значений функционала L(w) на каждой итерации</span></span>
-<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> np.zeros(X.shape[<span class="dv">1</span>])</span>
-<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>    w_history <span class="op">=</span> [w.copy()]</span>
-<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>    loss_history <span class="op">=</span> [hinge_svm_objective(w, X, y, lambd)]</span>
-<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, max_iter<span class="op">+</span><span class="dv">1</span>):</span>
-<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>        g <span class="op">=</span> hinge_svm_subgradient(w, X, y, lambd)</span>
-<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>        loss_current <span class="op">=</span> hinge_svm_objective(w, X, y, lambd)</span>
-<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Выбираем шаг</span></span>
-<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> step_rule <span class="op">==</span> <span class="st">'constant'</span>:</span>
-<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>            alpha <span class="op">=</span> c</span>
-<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> step_rule <span class="op">==</span> <span class="st">'1_over_k'</span>:</span>
-<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>            alpha <span class="op">=</span> c <span class="op">/</span> k</span>
-<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> step_rule <span class="op">==</span> <span class="st">'1_over_sqrt_k'</span>:</span>
-<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>            alpha <span class="op">=</span> c <span class="op">/</span> np.sqrt(k)</span>
-<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> step_rule <span class="op">==</span> <span class="st">'polyak'</span>:</span>
-<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Поляковский шаг: (f(w) - f_star) / ||g||^2 (с отсечением снизу нулём)</span></span>
-<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>            denom <span class="op">=</span> np.dot(g, g)</span>
-<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> denom <span class="op">&lt;</span> <span class="fl">1e-15</span>:</span>
-<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>                alpha <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
-<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>                alpha <span class="op">=</span> (loss_current <span class="op">-</span> f_star) <span class="op">/</span> denom</span>
-<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>                alpha <span class="op">=</span> <span class="bu">max</span>(alpha, <span class="fl">0.0</span>)  <span class="co"># чтобы шаг не был отрицательным</span></span>
-<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Неизвестная стратегия шага"</span>)</span>
-<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Обновление w</span></span>
-<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a>        w <span class="op">=</span> w <span class="op">-</span> alpha<span class="op">*</span>g</span>
-<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>        w_history.append(w.copy())</span>
-<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>        loss_history.append(hinge_svm_objective(w, X, y, lambd))</span>
-<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> w_history, loss_history</span>
-<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------- 5. Запуск эксперимента для разных правил шага ---------------------</span></span>
-<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>max_iter <span class="op">=</span> <span class="dv">50</span></span>
-<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>lambd <span class="op">=</span> <span class="fl">0.01</span></span>
-<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a><span class="co"># Для примера Polyak step будем считать f^*=0 (упрощение для демонстрации).</span></span>
-<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a>f_star_demo <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>strategies <span class="op">=</span> {</span>
-<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>    <span class="st">'constant'</span>:         <span class="fl">1.5</span>,   <span class="co"># константный шаг</span></span>
-<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1_over_k'</span>:         <span class="fl">5.0</span>,   <span class="co"># c для 1/k</span></span>
-<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1_over_sqrt_k'</span>:    <span class="fl">5.0</span>,   <span class="co"># c для 1/sqrt(k)</span></span>
-<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a>    <span class="st">'polyak'</span>:           <span class="va">None</span>   <span class="co"># для Polyak шаг c не используется</span></span>
-<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> {}</span>
-<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule, c_val <span class="kw">in</span> strategies.items():</span>
-<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>    w_hist, loss_hist <span class="op">=</span> subgradient_descent(</span>
-<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a>        X, y, lambd<span class="op">=</span>lambd, max_iter<span class="op">=</span>max_iter,</span>
-<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a>        step_rule<span class="op">=</span>rule,</span>
-<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a>        c<span class="op">=</span>c_val <span class="cf">if</span> c_val <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="cf">else</span> <span class="fl">1.0</span>,  <span class="co"># заглушка</span></span>
-<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>        f_star<span class="op">=</span>f_star_demo</span>
-<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a>    results[rule] <span class="op">=</span> (w_hist, loss_hist)</span>
-<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a><span class="co"># --------------------- 6. Графики ---------------------</span></span>
-<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) Изменение значения функционала</span></span>
-<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
-<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule <span class="kw">in</span> strategies.keys():</span>
-<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a>    loss_hist <span class="op">=</span> results[rule][<span class="dv">1</span>]</span>
-<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a>    plt.plot(loss_hist, label<span class="op">=</span><span class="ss">f"Шаг: </span><span class="sc">{</span>rule<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Номер итерации"</span>)</span>
-<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"L(w)"</span>)</span>
-<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Сравнение субградиентного спуска (SVM, hinge loss)</span><span class="ch">\n</span><span class="st">с разными шагами, включая шаг Поляка"</span>)</span>
-<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) Финальные разделяющие прямые</span></span>
-<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
-<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a>plt.scatter(X[y<span class="op">==</span><span class="dv">1</span>, <span class="dv">0</span>], X[y<span class="op">==</span><span class="dv">1</span>, <span class="dv">1</span>], label<span class="op">=</span><span class="st">"Класс +1"</span>)</span>
-<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a>plt.scatter(X[y<span class="op">==-</span><span class="dv">1</span>, <span class="dv">0</span>], X[y<span class="op">==-</span><span class="dv">1</span>, <span class="dv">1</span>], label<span class="op">=</span><span class="st">"Класс -1"</span>)</span>
-<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a>x_vals <span class="op">=</span> np.linspace(X[:,<span class="dv">0</span>].<span class="bu">min</span>()<span class="op">-</span><span class="dv">1</span>, X[:,<span class="dv">0</span>].<span class="bu">max</span>()<span class="op">+</span><span class="dv">1</span>, <span class="dv">200</span>)</span>
-<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule <span class="kw">in</span> strategies.keys():</span>
-<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a>    w_final <span class="op">=</span> results[rule][<span class="dv">0</span>][<span class="op">-</span><span class="dv">1</span>]  <span class="co"># последний w</span></span>
-<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">abs</span>(w_final[<span class="dv">1</span>]) <span class="op">&lt;</span> <span class="fl">1e-15</span>:</span>
-<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Вертикальная прямая</span></span>
-<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a>        x_const <span class="op">=</span> <span class="op">-</span><span class="fl">0.0</span></span>
-<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a>        plt.plot([x_const, x_const], [X[:,<span class="dv">1</span>].<span class="bu">min</span>()<span class="op">-</span><span class="dv">1</span>, X[:,<span class="dv">1</span>].<span class="bu">max</span>()<span class="op">+</span><span class="dv">1</span>],</span>
-<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>                 label<span class="op">=</span><span class="ss">f"Прямая (</span><span class="sc">{</span>rule<span class="sc">}</span><span class="ss">)"</span>)</span>
-<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>        y_vals <span class="op">=</span> <span class="op">-</span>(w_final[<span class="dv">0</span>]<span class="op">/</span>w_final[<span class="dv">1</span>]) <span class="op">*</span> x_vals</span>
-<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>        plt.plot(x_vals, y_vals, label<span class="op">=</span><span class="ss">f"Прямая (</span><span class="sc">{</span>rule<span class="sc">}</span><span class="ss">)"</span>)</span>
-<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"$x_1$"</span>)</span>
-<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"$x_2$"</span>)</span>
-<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Разделяющие прямые после 150 итераций</span><span class="ch">\n</span><span class="st">(разные шаги, включая Поляка)"</span>)</span>
-<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
-<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>A problem of the form is solved: <span class="math display">
+L(w) = \frac{\lambda}{2} \lVert w \rVert^2 + \frac{1}{N} \sum_{i=1}^{N} \max \left\{ 0,\ 1 - y_i w^T x_i \right\}.
+</span> It can be shown that the subgradient <span class="math display">
+g(w) = \lambda w + \frac{1}{N} \sum_{i=1}^{N}
+\begin{cases}
+  -y_i x_i, &amp; \text{if  } \  y_i w^T x_i &lt; 1, \\
+  0, &amp; \text{otherwise}.
+\end{cases}
+</span> The function <span class="math inline">\ell_i(w) = \max\left\{ 0,\ 1 - y_i w^T x_i \right\}</span> is called hinge loss.</p>
+<p>Let’s generate data for classification:</p>
+<div id="cell-4" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">100</span>  <span class="co"># number of objects</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>X1 <span class="op">=</span> np.random.randn(N<span class="op">//</span><span class="dv">2</span>, <span class="dv">2</span>) <span class="op">+</span> np.array([<span class="dv">2</span>, <span class="dv">2</span>])</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>X2 <span class="op">=</span> np.random.randn(N<span class="op">//</span><span class="dv">2</span>, <span class="dv">2</span>) <span class="op">+</span> np.array([<span class="op">-</span><span class="dv">2</span>, <span class="op">-</span><span class="dv">2</span>])</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.vstack([X1, X2])          <span class="co"># the matrix of objects x features</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.hstack([np.ones(N<span class="op">//</span><span class="dv">2</span>), <span class="op">-</span>np.ones(N<span class="op">//</span><span class="dv">2</span>)])  <span class="co"># class labels: +1, -1</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Let's mix everything together for clarity</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>perm <span class="op">=</span> np.random.permutation(N)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> X[perm]</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> y[perm]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Objective (hinge loss):</p>
+<div id="cell-6" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hinge_svm_objective(w, X, y, lambd):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns the value of the functional:</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">      L(w) = (lambda/2)*||w||^2 + (1/N)*sum( max(0, 1 - y_i * w^T x_i) ).</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    margins <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> y <span class="op">*</span> (X.dot(w))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    hinge_losses <span class="op">=</span> np.maximum(<span class="dv">0</span>, margins)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (lambd<span class="op">/</span><span class="dv">2</span>)<span class="op">*</span>np.<span class="bu">sum</span>(w<span class="op">**</span><span class="dv">2</span>) <span class="op">+</span> np.mean(hinge_losses)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The subgradient of the functional:</p>
+<div id="cell-8" class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hinge_svm_subgradient(w, X, y, lambd):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns the subgradient g(w) for:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">      g(w) = lambda*w + (1/N)*sum( -y_i*x_i, если y_i*w^T x_i &lt; 1 ).</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> X.shape[<span class="dv">0</span>]</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    margins <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> y <span class="op">*</span> (X.dot(w))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    active_mask <span class="op">=</span> (margins <span class="op">&gt;</span> <span class="dv">0</span>).astype(<span class="bu">float</span>)  <span class="co"># где hinge&gt;0</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Суммируем -y_i*x_i по всем активным (margin&gt;0)</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    grad_hinge <span class="op">=</span> <span class="op">-</span>(y <span class="op">*</span> active_mask)[:, np.newaxis] <span class="op">*</span> X</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    grad_hinge <span class="op">=</span> grad_hinge.mean(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    g <span class="op">=</span> lambd<span class="op">*</span>w <span class="op">+</span> grad_hinge</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Subgradient descent implementation:</p>
+<div id="cell-10" class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> subgradient_descent(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    X, y, lambd<span class="op">=</span><span class="fl">0.01</span>, </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    max_iter<span class="op">=</span><span class="dv">150</span>, </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    step_rule<span class="op">=</span><span class="st">'constant'</span>, </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    c<span class="op">=</span><span class="fl">1.0</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    f_star<span class="op">=</span><span class="fl">0.0</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">    Subgradient descent for SVM with hinge loss:</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">    Параметры:</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">      X, y       : selection</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">      lambd      : the regularization coefficient</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">      max_iter   : iteration number</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">      step_rule  : step selection strategy:</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">                     - 'constant'       -&gt; alpha_k = c</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">                     - '1_over_k'       -&gt; alpha_k = c/k</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">                     - '1_over_sqrt_k'  -&gt; alpha_k = c/sqrt(k)</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">                     - 'polyak'         -&gt; alpha_k = (f(w_k) - f_star)/||g_k||^2</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">      c          : constant for the step (used in all but not for 'polyak')</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">      f_star     : estimated minimum (for polyak)</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co">    Возвращает:</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co">      w_history   : the list of vectors w at each iteration</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co">      loss_history: the list of values of the functional L(w) at each iteration</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> np.zeros(X.shape[<span class="dv">1</span>])</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    w_history <span class="op">=</span> [w.copy()]</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    loss_history <span class="op">=</span> [hinge_svm_objective(w, X, y, lambd)]</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, max_iter<span class="op">+</span><span class="dv">1</span>):</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>        g <span class="op">=</span> hinge_svm_subgradient(w, X, y, lambd)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>        loss_current <span class="op">=</span> hinge_svm_objective(w, X, y, lambd)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Выбираем шаг</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> step_rule <span class="op">==</span> <span class="st">'constant'</span>:</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>            alpha <span class="op">=</span> c</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> step_rule <span class="op">==</span> <span class="st">'1_over_k'</span>:</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>            alpha <span class="op">=</span> c <span class="op">/</span> k</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> step_rule <span class="op">==</span> <span class="st">'1_over_sqrt_k'</span>:</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>            alpha <span class="op">=</span> c <span class="op">/</span> np.sqrt(k)</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> step_rule <span class="op">==</span> <span class="st">'polyak'</span>:</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Polyak's step: (f(w) - f_star) / ||g||^2 (with a zero cut-off from below)</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>            denom <span class="op">=</span> np.dot(g, g)</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> denom <span class="op">&lt;</span> <span class="fl">1e-15</span>:</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>                alpha <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>                alpha <span class="op">=</span> (loss_current <span class="op">-</span> f_star) <span class="op">/</span> denom</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>                alpha <span class="op">=</span> <span class="bu">max</span>(alpha, <span class="fl">0.0</span>)  <span class="co"># чтобы шаг не был отрицательным</span></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Неизвестная стратегия шага"</span>)</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Update w</span></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>        w <span class="op">=</span> w <span class="op">-</span> alpha<span class="op">*</span>g</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>        w_history.append(w.copy())</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>        loss_history.append(hinge_svm_objective(w, X, y, lambd))</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> w_history, loss_history</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Running an experiment for different step rules:</p>
+<div id="cell-12" class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>max_iter <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>lambd <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># For example Polyak step size will be considered f^*=0 (simplification for demonstration)</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>f_star_demo <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>strategies <span class="op">=</span> {</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'constant'</span>:         <span class="fl">1.5</span>,   <span class="co"># constant step size</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1_over_k'</span>:         <span class="fl">5.0</span>,   <span class="co"># for 1/k</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'1_over_sqrt_k'</span>:    <span class="fl">5.0</span>,   <span class="co"># for 1/sqrt(k)</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'polyak'</span>:           <span class="va">None</span>   <span class="co"># for Polyak is None</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> {}</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule, c_val <span class="kw">in</span> strategies.items():</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    w_hist, loss_hist <span class="op">=</span> subgradient_descent(</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        X, y, lambd<span class="op">=</span>lambd, max_iter<span class="op">=</span>max_iter,</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        step_rule<span class="op">=</span>rule,</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        c<span class="op">=</span>c_val <span class="cf">if</span> c_val <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="cf">else</span> <span class="fl">1.0</span>,</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        f_star<span class="op">=</span>f_star_demo</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    results[rule] <span class="op">=</span> (w_hist, loss_hist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Vizualization:</p>
+<div id="cell-14" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule <span class="kw">in</span> strategies.keys():</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    loss_hist <span class="op">=</span> results[rule][<span class="dv">1</span>]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    plt.plot(loss_hist, label<span class="op">=</span><span class="ss">f"Шаг: </span><span class="sc">{</span>rule<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Iteration number"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"L(w)"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Comparison of subgradient descent (SVM, hinge loss)</span><span class="ch">\n</span><span class="st"> with different steps"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>plt.scatter(X[y<span class="op">==</span><span class="dv">1</span>, <span class="dv">0</span>], X[y<span class="op">==</span><span class="dv">1</span>, <span class="dv">1</span>], label<span class="op">=</span><span class="st">"Class +1"</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>plt.scatter(X[y<span class="op">==-</span><span class="dv">1</span>, <span class="dv">0</span>], X[y<span class="op">==-</span><span class="dv">1</span>, <span class="dv">1</span>], label<span class="op">=</span><span class="st">"Class -1"</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>x_vals <span class="op">=</span> np.linspace(X[:,<span class="dv">0</span>].<span class="bu">min</span>()<span class="op">-</span><span class="dv">1</span>, X[:,<span class="dv">0</span>].<span class="bu">max</span>()<span class="op">+</span><span class="dv">1</span>, <span class="dv">200</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rule <span class="kw">in</span> strategies.keys():</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    w_final <span class="op">=</span> results[rule][<span class="dv">0</span>][<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">abs</span>(w_final[<span class="dv">1</span>]) <span class="op">&lt;</span> <span class="fl">1e-15</span>:</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>        x_const <span class="op">=</span> <span class="op">-</span><span class="fl">0.0</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>        plt.plot([x_const, x_const], [X[:,<span class="dv">1</span>].<span class="bu">min</span>()<span class="op">-</span><span class="dv">1</span>, X[:,<span class="dv">1</span>].<span class="bu">max</span>()<span class="op">+</span><span class="dv">1</span>],</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>                 label<span class="op">=</span><span class="ss">f"Dividing line (</span><span class="sc">{</span>rule<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        y_vals <span class="op">=</span> <span class="op">-</span>(w_final[<span class="dv">0</span>]<span class="op">/</span>w_final[<span class="dv">1</span>]) <span class="op">*</span> x_vals</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>        plt.plot(x_vals, y_vals, label<span class="op">=</span><span class="ss">f"Dividing line (</span><span class="sc">{</span>rule<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"$x_1$"</span>)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"$x_2$"</span>)</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Dividing lines after 150 iterations"</span>)</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="s13_svm_hingeloss_files/figure-html/cell-2-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="s13_svm_hingeloss_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="s13_svm_hingeloss_files/figure-html/cell-2-output-2.png" class="img-fluid figure-img"></p>
+<p><img src="s13_svm_hingeloss_files/figure-html/cell-7-output-2.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
