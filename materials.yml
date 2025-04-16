@@ -99,8 +99,8 @@
   materials: /lectures/13.pdf
   notes: /notes/13.pdf
   seminar: /seminars/13.pdf
-  youtube:
-  download:
+  youtube: https://youtu.be/D4j--0dgt58
+  download: https://disk.yandex.ru/i/6xq5Ej8ofD0Trw
 
 - title: Проксимальный градиентный метод.
   number: 14
