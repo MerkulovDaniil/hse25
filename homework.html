@@ -222,6 +222,8 @@ window.Quarto = {
   <li><a href="#stochastic-gradient-methods" id="toc-stochastic-gradient-methods" class="nav-link" data-scroll-target="#stochastic-gradient-methods">Stochastic gradient methods</a></li>
   <li><a href="#neural-network-training" id="toc-neural-network-training" class="nav-link" data-scroll-target="#neural-network-training">Neural network training</a></li>
   <li><a href="#big-models" id="toc-big-models" class="nav-link" data-scroll-target="#big-models">Big models</a></li>
+  <li><a href="#admm-dual-methods" id="toc-admm-dual-methods" class="nav-link" data-scroll-target="#admm-dual-methods">ADMM (Dual methods)</a></li>
+  <li><a href="#continuous-time-methods" id="toc-continuous-time-methods" class="nav-link" data-scroll-target="#continuous-time-methods">Continuous time methods</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/MerkulovDaniil/hse25/edit/main/homework.md" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></nav>
     </div>
@@ -1127,18 +1129,18 @@ f(y) \leq f(x^k) + \langle \nabla f(x^k), y - x^k \rangle + \frac{L}{2}\|x^k - y
 <h3 class="anchored" data-anchor-id="conjugate-gradients">Conjugate gradients</h3>
 <ol type="1">
 <li><p><strong><a href="https://web.stanford.edu/class/ee364b/364b_exercises.pdf">Randomized Preconditioners for Conjugate Gradient Methods.</a></strong> (20 points)</p>
-<p><strong>Linear least squares</strong></p>
-<p>In this task, we explore the use of some randomization methods for solving overdetermined least-squares problems, focusing on conjugate gradient methods. Let <span class="math inline">\hat{A} \in \mathbb{R}^{m \times n}</span> be a matrix (we assume that <span class="math inline">m \gg n</span>) and <span class="math inline">b \in \mathbb{R}^m</span>, we aim to minimize</p>
+<p><em>Linear least squares</em></p>
+<p>In this task, we explore the use of some randomization methods for solving overdetermined least-squares problems, focusing on conjugate gradient methods. Let <span class="math inline">\hat{A} \in \mathbb{R}^{m \times n}</span> be a matrix (we assume that <span class="math inline">m \gg n</span>) and <span class="math inline">\hat{b} \in \mathbb{R}^m</span>, we aim to minimize</p>
 <p><span class="math display">
-f(x) = \frac{1}{2} \|\hat{A}x - b\|^2_2 = \frac{1}{2} \sum_{i=1}^m (\hat{a}_i^T x - b_i)^2,
+f(x) = \frac{1}{2} \|\hat{A}x - \hat{b}\|^2_2 = \frac{1}{2} \sum_{i=1}^m (\hat{a}_i^T x - \hat{b}_i)^2,
 </span></p>
 <p>where the <span class="math inline">\hat{a}_i \in \mathbb{R}^n</span> denote the rows of <span class="math inline">\hat{A}</span>.</p>
-<p><strong>Preconditioners</strong></p>
+<p><em>Preconditioners</em></p>
 <p>We know, that the convergence bound of the CG applied for the problem depends on the condition number of the matrix. Note, that for the problem above we have the matrix <span class="math inline">\hat{A}^T \hat{A}</span> and the condition number is squared after this operation (<span class="math inline">\kappa (X^T X) =  \kappa^2 \left(X \right)</span>). That is the reason, why we typically need to use <em>preconditioners</em> (<a href="https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf">read 12. for more details</a>) with CG.</p>
 <p>The general idea of using preconditioners implies switchwing from solving <span class="math inline">Ax = b</span> to <span class="math inline">MAx = Mb</span> with hope, that <span class="math inline">\kappa \left( MA\right) \ll \kappa \left( A\right)</span> or eigenvalues of <span class="math inline">MA</span> are better clustered than those of <span class="math inline">A</span> (note, that matrix <span class="math inline">A</span> here is for the general case, here we have <span class="math inline">\hat{A}^T\hat{A}</span> instead).</p>
 <p>This idea can also be viewed as coordinate change <span class="math inline">x = T \hat{x}, \; \hat{x} = T^{-1}x</span>, which leads to the problem <span class="math inline">T^T A T \hat{x} = T^Tb</span>. Note, that the spectrum of <span class="math inline">T^TAT</span> is the same as the spectrum of <span class="math inline">MA</span>.</p>
 <p>The best choice of <span class="math inline">M</span> is <span class="math inline">A^{-1}</span>, because <span class="math inline">\kappa (A^{-1} A) = \kappa (I) = 1</span>. However, if we know <span class="math inline">A^{-1}</span>, the original problem is already solved, that is why we need to find some trade-off between enhanced convergence, and extra cost of working with <span class="math inline">M</span>. The goal is to find <span class="math inline">M</span> that is cheap to multiply, and approximate inverse of <span class="math inline">A</span> (or at least has a more clustered spectrum than <span class="math inline">A</span>).</p>
-<p>Note, that for the linear least squares problem the matrix of quadratic form is <span class="math inline">A = \hat{A}^T\hat{A}</span>. Below you can find Vanilla CG algorithm (on the left) and preconditioned CG algorithm (on the right):</p>
+<p>Note, that for the linear least squares problem the matrix of quadratic form is <span class="math inline">A = \hat{A}^T\hat{A} \in \mathbb{R}^{n \times n}</span> and the rhs vector is <span class="math inline">b = \hat{A}^T\hat{b} \in \mathbb{R}^n</span>. Below you can find Vanilla CG algorithm (on the left) and preconditioned CG algorithm (on the right):</p>
 <p><span class="math display">
 \begin{aligned}
 &amp; \mathbf{r}_0 := \mathbf{b} - \mathbf{A x}_0 \\
@@ -1159,7 +1161,7 @@ f(x) = \frac{1}{2} \|\hat{A}x - b\|^2_2 = \frac{1}{2} \sum_{i=1}^m (\hat{a}_i^T 
 \begin{aligned}
 &amp; \mathbf{r}_0 := \mathbf{b} - \mathbf{A x}_0 \\
 &amp; \text{if } \mathbf{r}_0 \text{ is sufficiently small, then return } \mathbf{x}_0 \text{ as the result} \\
-&amp; \mathbf{z}_0 := \mathbf{M}^{-1} \mathbf{r}_0 \\
+&amp; \mathbf{z}_0 := \mathbf{M} \mathbf{r}_0 \\
 &amp; \mathbf{d}_0 := \mathbf{z}_0 \\
 &amp; k := 0 \\
 &amp; \text{repeat} \\
@@ -1167,7 +1169,7 @@ f(x) = \frac{1}{2} \|\hat{A}x - b\|^2_2 = \frac{1}{2} \sum_{i=1}^m (\hat{a}_i^T 
 &amp; \qquad \mathbf{x}_{k+1} := \mathbf{x}_k + \alpha_k \mathbf{d}_k \\
 &amp; \qquad \mathbf{r}_{k+1} := \mathbf{r}_k - \alpha_k \mathbf{A d}_k \\
 &amp; \qquad \text{if } \mathbf{r}_{k+1} \text{ is sufficiently small, then exit loop} \\
-&amp; \qquad \mathbf{z}_{k+1} := \mathbf{M}^{-1} \mathbf{r}_{k+1} \\
+&amp; \qquad \mathbf{z}_{k+1} := \mathbf{M} \mathbf{r}_{k+1} \\
 &amp; \qquad \beta_k := \frac{\mathbf{r}_{k+1}^\mathsf{T} \mathbf{z}_{k+1}}{\mathbf{r}_k^\mathsf{T} \mathbf{z}_k} \\
 &amp; \qquad \mathbf{d}_{k+1} := \mathbf{z}_{k+1} + \beta_k \mathbf{d}_k \\
 &amp; \qquad k := k + 1 \\
@@ -1175,7 +1177,7 @@ f(x) = \frac{1}{2} \|\hat{A}x - b\|^2_2 = \frac{1}{2} \sum_{i=1}^m (\hat{a}_i^T 
 &amp; \text{return } \mathbf{x}_{k+1} \text{ as the result}
 \end{aligned}
 </span></p>
-<p><strong>Hadamard matrix</strong></p>
+<p><em>Hadamard matrix</em></p>
 <p>Given <span class="math inline">m \in \{2^i, i = 1, 2, \ldots\}</span>, the (unnormalized) Hadamard matrix of order <span class="math inline">m</span> is defined recursively as</p>
 <p><span class="math display">
 H_2 = \begin{bmatrix} 1 &amp; 1 \\ 1 &amp; -1 \end{bmatrix}, \quad \text{and} \quad H_m = \begin{bmatrix} H_{m/2} &amp; H_{m/2} \\ H_{m/2} &amp; -H_{m/2} \end{bmatrix}.
@@ -1207,7 +1209,8 @@ H_2 = \begin{bmatrix} 1 &amp; 1 \\ 1 &amp; -1 \end{bmatrix}, \quad \text{and} \q
 <li><p><strong>(2 point)</strong> How many FLOPs are required to naively compute <span class="math inline">\hat{A}^T \hat{A}</span>, assuming <span class="math inline">\hat{A}</span> is dense (using standard matrix algorithms)?</p></li>
 <li><p><strong>(2 point)</strong> How many FLOPs are required to compute <span class="math inline">\hat{A}^T \hat{A} v</span> for a vector <span class="math inline">v \in \mathbb{R}^n</span> by first computing <span class="math inline">u = \hat{A}v</span> and then computing <span class="math inline">\hat{A}^T u</span>?</p></li>
 <li><p><strong>(4 poins)</strong> Suppose that conjugate gradients runs for <span class="math inline">k</span> iterations. Using the preconditioned conjugate gradient algorithm with <span class="math inline">M = (\hat{A}^T \Phi^T \Phi \hat{A})^{-1}</span>, how many total floating point operations have been performed? How many would be required to directly solve <span class="math inline">\hat{A}^T \hat{A} x = \hat{A}^T b</span>? How large must <span class="math inline">k</span> be to make the conjugate gradient method slower?</p></li>
-<li><p><strong>(10 points)</strong> Implement the conjugate gradient algorithm for solving the positive definite linear system <span class="math inline">\hat{A}^T \hat{A} x = \hat{A}^T b</span> both with and without the preconditioner <span class="math inline">M</span>. To generate data for your problem, set <span class="math inline">m = 2^{12}</span> and <span class="math inline">n = 400</span>, then generate the matrix <span class="math inline">A</span> and the vector <span class="math inline">b</span>. For simplicity in implementation, you may directly pass <span class="math inline">\hat{A}^T \hat{A}</span> and <span class="math inline">\hat{A}^T b</span> into your conjugate gradient solver, as we only wish to explore how the methods work.</p>
+<li><p><strong>(10 points)</strong> Implement the conjugate gradient algorithm for solving the positive definite linear system <span class="math inline">\hat{A}^T \hat{A} x = \hat{A}^T b</span> both with and without the preconditioner <span class="math inline">M</span>. To generate data for your problem, set <span class="math inline">m = 2^{12}</span> and <span class="math inline">n = 400</span>, then generate the matrix <span class="math inline">A</span> and the vector <span class="math inline">b</span>. For simplicity in implementation, you may directly pass <span class="math inline">\hat{A}^T \hat{A}</span> and <span class="math inline">\hat{A}^T b</span> into your conjugate gradient solver, as we only wish to explore how the methods work.</p></li>
+</ol>
 <div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.sparse <span class="im">import</span> diags</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1219,7 +1222,6 @@ H_2 = \begin{bmatrix} 1 &amp; 1 \\ 1 &amp; -1 \end{bmatrix}, \quad \text{and} \q
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.random.randn(m, n) <span class="op">*</span> diags(values).toarray()</span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> np.random.randn(m, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Plot the norm of the residual <span class="math inline">r_k = \hat{A}^T b - \hat{A}^T \hat{A} x_k</span> (relative to <span class="math inline">\|\hat{A}^T b\|_2</span>) as a function of iteration <span class="math inline">k</span> for each of your conjugate gradient procedures. Additionally, compute and print the condition numbers <span class="math inline">\kappa(\hat{A}^T \hat{A})</span> and <span class="math inline">\kappa(M^{1/2} \hat{A}^T \hat{A} M^{1/2})</span>.</p></li>
-</ol></li>
 </ol>
 </section>
 <section id="newton-and-quasinewton-methods" class="level3">
@@ -1336,25 +1338,174 @@ f(w) = -\sum_{i=1}^n \left[ y_i \log(p(y_i=1 | x_i; w)) + (1-y_i) \log(1-p(y_i=1
 </section>
 <section id="conditional-gradient-methods" class="level3">
 <h3 class="anchored" data-anchor-id="conditional-gradient-methods">Conditional gradient methods</h3>
+<ol type="1">
+<li><p><strong>Projection onto the Birkhoff Polytope using Frank-Wolfe</strong> [20 points]</p>
+<p>In a recent <a href="https://arxiv.org/pdf/2211.14103">book</a> authors presented the following comparison table with complexities of linear minimizations and projections on some convex sets up to an additive error <span class="math inline">\epsilon</span> in the Euclidean norm. When <span class="math inline">\epsilon</span> is missing, there is no additive error. The <span class="math inline">\tilde{\mathcal{O}}</span> hides polylogarithmic factors in the dimensions and polynomial factors in constants related to thedistancetothe optimum. For the nuclear norm ball, i.e., the spectrahedron, <span class="math inline">\nu</span> denotes the number of non-zero entries and <span class="math inline">\sigma_1</span> denotes the top singular value of the projected matrix.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 45%">
+<col style="width: 37%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Set</strong></th>
+<th><strong>Linear minimization</strong></th>
+<th><strong>Projection</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">n</span>-dimensional <span class="math inline">\ell_p</span>-ball, <span class="math inline">p \neq 1,2,\infty</span></td>
+<td><span class="math inline">\mathcal{O}(n)</span></td>
+<td><span class="math inline">\tilde{\mathcal{O}}\!\bigl(\tfrac{n}{\epsilon^2}\bigr)</span></td>
+</tr>
+<tr class="even">
+<td>Nuclear norm ball of <span class="math inline">n\times m</span> matrices</td>
+<td><span class="math inline">\mathcal{O}\!\Bigl(\nu\,\ln(m + n)\,\tfrac{\sqrt{\sigma_1}}{\sqrt{\epsilon}}\Bigr)</span></td>
+<td><span class="math inline">\mathcal{O}\!\bigl(m\,n\,\min\{m,n\}\bigr)</span></td>
+</tr>
+<tr class="odd">
+<td>Flow polytope on a graph with <span class="math inline">m</span> vertices and <span class="math inline">n</span> edges (capacity bound on edges)</td>
+<td><span class="math inline">\mathcal{O}\!\Bigl((n \log m)\bigl(n + m\,\log m\bigr)\Bigr)</span></td>
+<td><span class="math inline">\tilde{\mathcal{O}}\!\bigl(\tfrac{n}{\epsilon^2}\bigr)\ \text{or}\ \mathcal{O}(n^4\,\log n)</span></td>
+</tr>
+<tr class="even">
+<td>Birkhoff polytope (<span class="math inline">n \times n</span> doubly stochastic matrices)</td>
+<td><span class="math inline">\mathcal{O}(n^3)</span></td>
+<td><span class="math inline">\tilde{\mathcal{O}}\!\bigl(\tfrac{n^2}{\epsilon^2}\bigr)</span></td>
+</tr>
+</tbody>
+</table>
+<p>The Birkhoff polytope, denoted as <span class="math inline">B_n</span>, is the set of <span class="math inline">n \times n</span> doubly stochastic matrices: <span class="math display">
+B_n = \{ X \in \mathbb{R}^{n \times n} \mid X_{ij} \ge 0 \;\forall i,j, \quad X \mathbf{1} = \mathbf{1}, \quad X^T \mathbf{1} = \mathbf{1} \}
+</span> where <span class="math inline">\mathbf{1}</span> is the vector of all ones. This set is convex and compact. Its extreme points are the permutation matrices.</p>
+<p>Given an arbitrary matrix <span class="math inline">Y \in \mathbb{R}^{n \times n}</span>, we want to find its projection onto <span class="math inline">B_n</span>, which is the solution to the optimization problem: <span class="math display">
+\min_{X \in B_n} f(X) = \frac{1}{2} \| X - Y \|_F^2
+</span> where <span class="math inline">\| \cdot \|_F</span> is the Frobenius norm.</p>
+<p>We will use the Frank-Wolfe (Conditional Gradient) algorithm to solve this problem. Recall the steps of the Frank-Wolfe algorithm:</p>
+<ul>
+<li>Initialize <span class="math inline">X_0 \in B_n</span>.</li>
+<li>For <span class="math inline">k = 0, 1, 2, \ldots</span>:
+<ul>
+<li>Compute the gradient <span class="math inline">\nabla f(X_k)</span>.</li>
+<li>Solve the Linear Minimization Oracle (LMO): <span class="math inline">S_k = \arg\min_{S \in B_n} \langle \nabla f(X_k), S \rangle</span>.</li>
+<li>Determine the step size <span class="math inline">\gamma_k \in [0, 1]</span>.</li>
+<li>Update <span class="math inline">X_{k+1} = (1-\gamma_k) X_k + \gamma_k S_k</span>.</li>
+</ul></li>
+</ul>
+<p><strong>Tasks:</strong></p>
+<ol type="1">
+<li><p>[5 points] Explicitly write down the gradient <span class="math inline">\nabla f(X_k)</span>. Explain how to solve the LMO step <span class="math inline">\min_{S \in B_n} \langle \nabla f(X_k), S \rangle</span>. What kind of matrix is the solution <span class="math inline">S_k</span>? <em>Hint: Consider the connection to the linear assignment problem (Hungarian algorithm).</em></p></li>
+<li><p>[10 points] Implement the Frank-Wolfe algorithm in Python to solve the projection problem. Use <code>scipy.optimize.linear_sum_assignment</code> to solve the LMO. For the step size, you can use the optimal closed-form solution for projection: <span class="math inline">\gamma_k = \frac{\langle X_k - Y, X_k - S_k \rangle}{\| X_k - S_k \|_F^2}</span>, clipped to <span class="math inline">[0, 1]</span>.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> linear_sum_assignment</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> project_to_birkhoff_frank_wolfe(Y, max_iter<span class="op">=</span><span class="dv">100</span>, tol<span class="op">=</span><span class="fl">1e-6</span>):</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">    Projects matrix Y onto the Birkhoff polytope using the Frank-Wolfe algorithm.</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">        Y (np.ndarray): The matrix to project.</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co">        max_iter (int): Maximum number of iterations.</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co">        tol (float): Tolerance for convergence (change in objective value).</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co">        np.ndarray: The projection of Y onto the Birkhoff polytope.</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co">        list: History of objective function values.</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> Y.shape[<span class="dv">0</span>]</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> Y.shape[<span class="dv">0</span>] <span class="op">==</span> Y.shape[<span class="dv">1</span>], <span class="st">"Input matrix must be square"</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Initialize with a feasible point (e.g., uniform matrix)</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    Xk <span class="op">=</span> np.ones((n, n)) <span class="op">/</span> n</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    objective_history <span class="op">=</span> []</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(max_iter):</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Objective function value</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>        obj_val <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> np.linalg.norm(Xk <span class="op">-</span> Y, <span class="st">'fro'</span>)<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>        objective_history.append(obj_val)</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> k <span class="op">&gt;</span> <span class="dv">0</span> <span class="kw">and</span> <span class="bu">abs</span>(objective_history[<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> objective_history[<span class="op">-</span><span class="dv">2</span>]) <span class="op">&lt;</span> tol:</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"Converged after </span><span class="sc">{</span>k<span class="sc">}</span><span class="ss"> iterations."</span>)</span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 1. Compute gradient</span></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>        grad_fk <span class="op">=</span> ... <span class="co"># YOUR CODE HERE </span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 2. Solve the LMO: S_k = argmin_{S in Birkhoff} &lt;grad_fk, S&gt;</span></span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Use linear_sum_assignment on the cost matrix grad_fk</span></span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a>        row_ind, col_ind <span class="op">=</span> ... <span class="co"># YOUR CODE HERE using linear_sum_assignment</span></span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>        Sk <span class="op">=</span> np.zeros((n, n))</span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Construct permutation matrix Sk based on row_ind, col_ind</span></span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>        ... <span class="co"># YOUR CODE HERE </span></span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 3. Compute step size gamma_k </span></span>
+<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Optimal step size for projection, clipped to [0, 1]</span></span>
+<span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a>        delta_k <span class="op">=</span> Xk <span class="op">-</span> Sk</span>
+<span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a>        denom <span class="op">=</span> np.linalg.norm(delta_k, <span class="st">'fro'</span>)<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> denom <span class="op">&lt;</span> <span class="fl">1e-12</span>: <span class="co"># Avoid division by zero if Xk is already the vertex Sk</span></span>
+<span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a>            gamma_k <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb17-52"><a href="#cb17-52" aria-hidden="true" tabindex="-1"></a>            gamma_k <span class="op">=</span> ... <span class="co"># YOUR CODE HERE for optimal step size</span></span>
+<span id="cb17-53"><a href="#cb17-53" aria-hidden="true" tabindex="-1"></a>            gamma_k <span class="op">=</span> np.clip(gamma_k, <span class="fl">0.0</span>, <span class="fl">1.0</span>) </span>
+<span id="cb17-54"><a href="#cb17-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-55"><a href="#cb17-55" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 4. Update</span></span>
+<span id="cb17-56"><a href="#cb17-56" aria-hidden="true" tabindex="-1"></a>        Xk <span class="op">=</span> ... <span class="co"># YOUR CODE HERE </span></span>
+<span id="cb17-57"><a href="#cb17-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-58"><a href="#cb17-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>: <span class="co"># If loop finishes without breaking</span></span>
+<span id="cb17-59"><a href="#cb17-59" aria-hidden="true" tabindex="-1"></a>         <span class="bu">print</span>(<span class="ss">f"Reached max iterations (</span><span class="sc">{</span>max_iter<span class="sc">}</span><span class="ss">)."</span>)</span>
+<span id="cb17-60"><a href="#cb17-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-61"><a href="#cb17-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Xk, objective_history</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>[5 points] Test your implementation with <span class="math inline">n=5</span> and a randomly generated matrix <span class="math inline">Y = \text{np.random.rand}(5, 5)</span>. Run the algorithm for 200 iterations. Plot the objective function value <span class="math inline">f(X_k)</span> versus the iteration number <span class="math inline">k</span>. Verify numerically that the final matrix <span class="math inline">X_{200}</span> approximately satisfies the conditions for being in <span class="math inline">B_5</span> (non-negative entries, row sums equal to 1, column sums equal to 1).</p></li>
+</ol></li>
+<li><p><strong>[Minimizing a Quadratic over the Simplex]</strong> [20 points] Consider the problem of minimizing a quadratic function over the standard probability simplex: <span class="math display">
+\min_{x \in \Delta_n} f(x) = \frac{1}{2} x^T Q x + c^T x
+</span> where <span class="math inline">\Delta_n = \{x \in \mathbb{R}^n \mid \sum_{i=1}^n x_i = 1, x_i \ge 0\}</span> is the standard simplex in <span class="math inline">\mathbb{R}^n</span>, <span class="math inline">Q \in \mathbb{S}^n_{++}</span> is a positive definite matrix, and <span class="math inline">c \in \mathbb{R}^n</span>.</p>
+<ul>
+<li>[5 points] Generate the problem data: Choose a dimension <span class="math inline">n</span> (e.g., <span class="math inline">n=20</span>). Create a random positive definite matrix <span class="math inline">Q</span> with a given spectrum <span class="math inline">[\mu; L]</span> and a random vector <span class="math inline">x^* \in \Delta_n</span>, so <span class="math inline">c = -Q x^*</span> (e.g., with standard normal entries).
+<ul>
+<li>Specify and consider <span class="math inline">2</span> different starting points (you will use them for another algorithm as well)</li>
+<li>Calculate <span class="math inline">f(x^*)</span> and <span class="math inline">f(x_0)</span>, you will have to track <span class="math inline">|f(x_k) - f(x^*)|</span> for both algorithms</li>
+</ul></li>
+<li>[7 points] Implement the Frank-Wolfe (Conditional Gradient) algorithm to solve this problem. Do not forget to start from a feasible point.</li>
+<li>[8 points] Implement the Projected Gradient Descent algorithm.
+<ul>
+<li>Use the same starting points <span class="math inline">x_0</span>.</li>
+<li>Justify learning rate selection.</li>
+<li>We do not have an explicit formula for Euclidean projection onto the standard simplex. You will need an algorithm for projection onto the standard simplex (e.g., see <a href="https://stanford.edu/~jduchi/projects/DuchiShSiCh08.pdf">Duchi et al., 2008</a> or use available implementations).</li>
+</ul></li>
+<li>Plot the objective function value <span class="math inline">f(x_k)</span> versus the iteration number <span class="math inline">k</span> for both Frank-Wolfe and Projected Gradient Descent on the same graph. Compare their convergence behavior. Discuss which method appears to converge faster in terms of iterations for this problem.</li>
+</ul></li>
+</ol>
 </section>
 <section id="subgradient-method" class="level3">
 <h3 class="anchored" data-anchor-id="subgradient-method">Subgradient method</h3>
 <ol type="1">
-<li><p><strong>Finding a point in the intersection of convex sets.</strong> [30 points] Let <span class="math inline">A \in \mathbb{R}^{n \times n}</span> be a positive definite matrix and let <span class="math inline">\Sigma</span> be an <span class="math inline">n \times n</span> diagonal matrix with diagonal entries <span class="math inline">\sigma_1,...,\sigma_n &gt; 0</span>, and <span class="math inline">y</span> a given vector in <span class="math inline">\mathbb{R}^n</span>. Consider the compact convex sets <span class="math inline">U = \{x \in \mathbb{R}^n \mid \|A^{1/2}(x-y)\|_2 \leq 1\}</span> and <span class="math inline">V = \{x \in \mathbb{R}^n \mid \|\Sigma x\|_\infty \leq 1\}</span>.</p>
+<li><p><strong>Finding a point in the intersection of convex sets.</strong> [30 points] Let <span class="math inline">A \in \mathbb{R}^{n \times n}</span> be some non-degenerate matrix and let <span class="math inline">\Sigma</span> be an <span class="math inline">n \times n</span> diagonal matrix with diagonal entries <span class="math inline">\sigma_1,...,\sigma_n &gt; 0</span>, and <span class="math inline">y</span> a given vector in <span class="math inline">\mathbb{R}^n</span>. Consider the compact convex sets <span class="math inline">U = \{x \in \mathbb{R}^n \mid \|A(x-y)\|_2 \leq 1\}</span> and <span class="math inline">V = \{x \in \mathbb{R}^n \mid \|\Sigma x\|_\infty \leq 1\}</span>.</p>
 <ul>
-<li><p>Minimize maximum distance from the current point to the convex sets.</p>
+<li><p>[10 points] Minimize maximum distance from the current point to the convex sets.</p>
 <p><span class="math display">
   \min_{x\in\mathbb{R}^n} f(x) =  \min_{x\in\mathbb{R}^n} \max\{\mathbf{dist}(x, U), \mathbf{dist}(x, V)\}
   </span></p>
-<p>propose an algorithm to find a point <span class="math inline">x \in U \cap V</span>. You can assume that <span class="math inline">U \cap V</span> is not empty. Your algorithm must be provably converging (although you do not need to prove it and you can simply refer to the lecture slides).</p></li>
-<li><p>Implement your algorithm with the following data: <span class="math inline">n = 2</span>, <span class="math inline">y = (3, 2)</span>, <span class="math inline">\sigma_1 = 0.5</span>, <span class="math inline">\sigma_2 = 1</span>,</p>
+<p>propose an algorithm to find a point <span class="math inline">x \in U \cap V</span>. You can assume that <span class="math inline">U \cap V</span> is not empty. Your algorithm must be specific and provably converging (although you do not need to prove it and you can simply refer to the lecture slides).</p></li>
+<li><p>[15 points] Implement your algorithm with the following data: <span class="math inline">n = 2</span>, <span class="math inline">y = (3, 2)</span>, <span class="math inline">\sigma_1 = 0.5</span>, <span class="math inline">\sigma_2 = 1</span>,</p>
 <p><span class="math display">
   A = \begin{bmatrix}
   1 &amp; 0 \\
   -1 &amp; 1
   \end{bmatrix},
   </span></p>
-<p>and <span class="math inline">x = (2, 1)</span>. Plot the objective value of your optimization problem versus the number of iterations.</p></li>
+<p>Plot the objective value of your optimization problem versus the number of iterations. Choose the following initial points <span class="math inline">x_0 = [(2, -1), (0, 0), (1, 2)]</span>.</p></li>
+<li><p>[5 points] Discussion: compare the three curves. Describe the properties of this optimization problem.</p>
+<ul>
+<li>Is it convex/strongly convex?</li>
+<li>Is it smooth?</li>
+<li>Do we have a unique solution here?</li>
+<li>Which start converges fastest / slowest and why? Relate your observations to the initial distance to <span class="math inline">U \cap V</span> and to the contact angle between the two sets at the solution.</li>
+</ul></li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1362,6 +1513,30 @@ f(w) = -\sum_{i=1}^n \left[ y_i \log(p(y_i=1 | x_i; w)) + (1-y_i) \log(1-p(y_i=1
 <figcaption>Illustration of the problem</figcaption>
 </figure>
 </div></li>
+<li><p><strong>Subgradient methods for Lasso.</strong> (10 points)</p>
+<p>Consider the optimization problem</p>
+<p><span class="math display">
+\min_{x \in \mathbb{R}^n} f(x) := \frac12 \|Ax - b\|^2 + \lambda \|x\|_1,
+</span></p>
+<p>with variables <span class="math inline">x \in \mathbb{R}^n</span> and problem data <span class="math inline">A \in \mathbb{R}^{m \times n}</span>, <span class="math inline">b \in \mathbb{R}^m</span> and <span class="math inline">\lambda &gt; 0</span>. This model is known as Lasso, or Least Squares with <span class="math inline">l_1</span> regularization, which encourages sparsity in the solution via the non-smooth penalty <span class="math inline">\|x\|_1 := \sum_{j=1}^n |x_j|</span>. In this problem, we will explore various subgradient methods for fitting this model.</p>
+<ul>
+<li><p>Derive the subdifferential <span class="math inline">\partial f(x)</span> of the objective.</p></li>
+<li><p>Find the update rule of the subgradient method and state the computational complexity of applying one update using big O notation in terms of the dimensions.</p></li>
+<li><p>Let <span class="math inline">n = 1000</span>, <span class="math inline">m = 200</span> and <span class="math inline">\lambda = 0.01</span>. Generate a random matrix <span class="math inline">A \in \mathbb{R}^{m \times n}</span> with independent Gaussian entries with mean 0 and variance <span class="math inline">1/m</span>, and a fixed vector <span class="math inline">x^* = {\underbrace{[1, \ldots, 1}_{\text{k times}}, \underbrace{0, \ldots, 0]}_{\text{n-k times}}}^T \in \mathbb{R}^n</span>. Let <span class="math inline">k = 5</span> and then set <span class="math inline">b = Ax^*</span>. Implement the subgradient method to minimize <span class="math inline">f(x)</span>, initialized at the all-zeros vector. Try different step size rules, including:</p>
+<ul>
+<li><p>constant step size <span class="math inline">\alpha_k = \alpha</span></p></li>
+<li><p>constant step length <span class="math inline">\alpha_k = \frac{\gamma}{\|g_k\|_2}</span> (so <span class="math inline">\|x^{k+1} - x^k\|_2 = \gamma</span>)</p></li>
+<li><p>Inverse square root <span class="math inline">\frac{1}{\sqrt{k}}</span></p></li>
+<li><p>Inverse <span class="math inline">\frac1k</span></p></li>
+<li><p>Polyak’s step length with estimated objective value:</p>
+<p><span class="math display">
+  \alpha_k = \frac{f(x_k) - f_k^{\text{best}} + \gamma_k}{\|g_k\|_2^2}, \quad \text{ with} \sum_{k=1}^\infty \gamma_k = \infty, \quad \sum_{k=1}^\infty \gamma_k^2 &lt; \infty
+  </span></p>
+<p>For example, one can use <span class="math inline">\gamma_k = \frac{10}{10 + k}</span>. Here <span class="math inline">f_k^{\text{best}} - \gamma_k</span> serves as estimate of <span class="math inline">f^*</span>. It is better to take <span class="math inline">\gamma_k</span> in the same scale as the objective value. One can show, that <span class="math inline">f_k^{\text{best}} \to f^*</span>.</p></li>
+</ul>
+<p>Plot objective value versus iteration curves of different step size rules on the same figure.</p></li>
+<li><p>Repeat previous part using a heavy ball term, <span class="math inline">\beta_k(x^k - x^{k-1})</span>, added to the subgradient. Try different step size rules as in the previous part and tune the heavy ball parameter <span class="math inline">\beta_k = \beta</span> for faster convergence.</p></li>
+</ul></li>
 </ol>
 </section>
 <section id="proximal-gradient-method" class="level3">
@@ -1580,12 +1755,366 @@ P(y = j | x; W) = \frac{e^{W_j^T x}}{\sum\limits_{i=1}^{c} e^{W_i^T x}}
 </section>
 <section id="stochastic-gradient-methods" class="level3">
 <h3 class="anchored" data-anchor-id="stochastic-gradient-methods">Stochastic gradient methods</h3>
+<ol type="1">
+<li><p><strong>Variance reduction for stochastic gradient methods</strong>. [20 points]</p>
+<p>[5 points]Open <a href="https://colab.research.google.com/github/MerkulovDaniil/optim/blob/master/assets/Notebooks/VR_exercise.ipynb">colab notebook</a>. Implement SAG and SVRG method. Consider Linear least squares problem with the following setup</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>params <span class="op">=</span> {</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mu"</span>: <span class="dv">0</span>,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"m"</span>: <span class="dv">50</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n"</span>: <span class="dv">100</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"methods"</span>: [</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SGD"</span>,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">1e-2</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">2</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">1000</span>,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SGD"</span>,</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">1e-2</span>,</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">50</span>,</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">1000</span>,</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SAG"</span>,</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">1e-2</span>,</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">2</span>,</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">1000</span>,</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SVRG"</span>,</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">1e-2</span>,</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>            <span class="st">"epoch_length"</span>: <span class="dv">2</span>,</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">2</span>,</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">1000</span>,</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> run_experiments(params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>[5 points] Then, consider strongly convex case with:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>params <span class="op">=</span> {</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mu"</span>: <span class="fl">1e-1</span>,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"m"</span>: <span class="dv">50</span>,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n"</span>: <span class="dv">100</span>,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"methods"</span>: [</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SGD"</span>,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">1e-2</span>,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">2</span>,</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">2000</span>,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SGD"</span>,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">1e-2</span>,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">50</span>,</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">2000</span>,</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SAG"</span>,</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">1e-2</span>,</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">2</span>,</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">2000</span>,</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SVRG"</span>,</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">1e-2</span>,</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>            <span class="st">"epoch_length"</span>: <span class="dv">2</span>,</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">2</span>,</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">2000</span>,</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>[5 points] And for the convex binary logistic regression:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>params <span class="op">=</span> {</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mu"</span>: <span class="dv">0</span>,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"m"</span>: <span class="dv">100</span>,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n"</span>: <span class="dv">200</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"methods"</span>: [</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SGD"</span>,</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">1e-2</span>,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">2</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">2000</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SAG"</span>,</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">1e-2</span>,</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">2</span>,</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">2000</span>,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SVRG"</span>,</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">1e-2</span>,</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"epoch_length"</span>: <span class="dv">3</span>,</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">2</span>,</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">2000</span>,</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SGD"</span>,</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">1e-2</span>,</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">100</span>,</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">2000</span>,</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>[5 points] and strongly convex case</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>params <span class="op">=</span> {</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mu"</span>: <span class="fl">1e-1</span>,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"m"</span>: <span class="dv">100</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n"</span>: <span class="dv">200</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"methods"</span>: [</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SGD"</span>,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">2e-2</span>,</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">2</span>,</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">3000</span>,</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SAG"</span>,</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">2e-2</span>,</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">2</span>,</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">3000</span>,</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SVRG"</span>,</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">2e-2</span>,</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"epoch_length"</span>: <span class="dv">3</span>,</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">2</span>,</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">3000</span>,</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>            <span class="st">"method"</span>: <span class="st">"SGD"</span>,</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>            <span class="st">"learning_rate"</span>: <span class="fl">2e-2</span>,</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>            <span class="st">"batch_size"</span>: <span class="dv">100</span>,</span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>            <span class="st">"iterations"</span>: <span class="dv">3000</span>,</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Describe the obtained convergence and compare methods.</p>
+<p><img src="lls_VR.svg" class="img-fluid"></p>
+<p><img src="logreg_VR.svg" class="img-fluid"></p></li>
+</ol>
 </section>
 <section id="neural-network-training" class="level3">
 <h3 class="anchored" data-anchor-id="neural-network-training">Neural network training</h3>
+<ol type="1">
+<li><p><strong>Anomaly detection with neural network.</strong> [20 points]</p>
+<p>In this problem we will try to detect anomalies in time series with neural network.</p></li>
+</ol>
+<div class="plotly">
+<p>anomaly_detection.html</p>
+</div>
+<pre><code>We will train the model to reconstruct normal data and when the reconstruction error for the actual data on trained model is high, we report an anomaly. Start with this notebook [\faPython colab notebook](https://colab.research.google.com/github/MerkulovDaniil/optim/blob/master/assets/Notebooks/time_series_anomaly.ipynb). The default solution is adam and after training it can detect 4 out of 5 anomalies. Train and compare several methods on the same problem. For each method try to find hyperparameters, which ensures at least 3 out of 5 anomalies detection. Present learning curves and anomaly predictions for each method.
+
+* SGD with momentum [5 points] from optax
+* Adadelta [5 points] from optax
+* BFGS [10 points] implemented manually
+* [Muon](https://github.com/KellerJordan/Muon) [optimizer](https://arxiv.org/pdf/2502.16982) [10 points] implemented manually</code></pre>
 </section>
 <section id="big-models" class="level3">
 <h3 class="anchored" data-anchor-id="big-models">Big models</h3>
+<ol type="1">
+<li><p><strong>Fit the largest model you can on a single GPU.</strong> [15 points]</p>
+<p>In this assignment, you will train a language model (LM) using the TinyStories dataset, focusing on optimizing model performance within the constraints of Google Colab’s hardware. For the sake of speed, we will do it on the part of the dataset.</p>
+<pre class="tiny_stories"><code>Once upon a time, there was a little car named Beep. Beep loved to go fast and play in the sun. 
+Beep was a healthy car because he always had good fuel....</code></pre>
+<p>Your objective is to maximize the size of the model without exceeding the available computational resources (~ 16GB VRAM). You could start with the Hugging Face Transformers library and experiment with various memory optimization techniques, such as (but not limited to):</p>
+<pre><code> * Different batch size
+ * Different optimizer
+ * Gradient accumulation
+ * Activation checkpointing
+ * CPU offloading
+ * 8bit optimizers</code></pre>
+<p>You have a baseline of training <code>gpt-2</code> model prepared at the following <a href="https://colab.research.google.com/github/MerkulovDaniil/optim/blob/master/assets/Notebooks/TinyStories_baseline.ipynb">colab notebook</a>. You can easily switch it to <code>opt-350m</code>, <code>opt-1.3b</code>, <code>gpt2</code> etc. You can find a great beginner-level guide on the topic <a href="https://huggingface.co/docs/transformers/v4.18.0/en/performance">here</a>.</p>
+<pre class="gpt2"><code>A long time ago in a galaxy far far away... a little girl named Lily was playing in the garden. She was so excited! She wanted to explore the garden and see what was around her.
+Suddenly, she heard a loud noise. Lily looked up and saw a big, hairy creature. Lily was so excited! She ran to the creature and grabbed it by the arm. The creature was so big and hairy that Lily couldn't help but laugh. </code></pre>
+<p><img src="gpt2_generation.jpeg" class="img-fluid"></p>
+<p>You have to fill this table with your description/observations.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 21%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Setup</th>
+<th style="text-align: center;"># of parameters</th>
+<th style="text-align: center;">GPU peak memory, MB</th>
+<th style="text-align: center;">Final eval loss</th>
+<th style="text-align: center;">Batch Size</th>
+<th style="text-align: center;">Time to run 5 epochs, s</th>
+<th style="text-align: center;">Generation example</th>
+<th style="text-align: center;">Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Baseline (OPT-125M)</td>
+<td style="text-align: center;">125 M</td>
+<td style="text-align: center;">9044</td>
+<td style="text-align: center;">1.928</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">442.34</td>
+<td style="text-align: center;"><code>A long time ago in a galaxy far far away... there was a little girl named Lily. She was three years old and loved to explore. One day, she decided to go for a walk in the park. Lily was so excited to go for a walk. She asked her mom, "What do you want to do?" Her mom smiled and said, "I want to explore the galaxy." Lily was so excited to explore the galaxy.</code></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Baseline (GPT2-S)</td>
+<td style="text-align: center;">124 M</td>
+<td style="text-align: center;">13016</td>
+<td style="text-align: center;">2.001</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">487.75</td>
+<td style="text-align: center;"><code>A long time ago in a galaxy far far away... a little girl named Lily was playing in the garden. She was so excited! She wanted to explore the garden and see what was around her. Suddenly, she heard a loud noise. Lily looked up and saw a big, hairy creature. Lily was so excited! She ran to the creature and grabbed it by the arm. The creature was so big and hairy that Lily couldn't help but laugh.</code></td>
+<td style="text-align: center;">The generation seems more interesting, despite the fact, that eval loss is higher.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<p>For each unique trick for memory optimization, you will get 3 points (maximum 15 points). A combination of tricks is not counted as a unique trick, but will, probably, be necessary to train big models. The maximum grade is bounded with the size of the trained model: * If the model size you train is &lt;= 125M - you can get a maximum of 6 points. * If the model size you train is 126M &lt;= 350M - you can get a maximum of 8 points. * If the model size you train is 350M &lt;= 1B - you can get a maximum of 12 points. * If you fit 1B model or more - you can get a maximum 15 points.</p></li>
+</ol>
+</section>
+<section id="admm-dual-methods" class="level3">
+<h3 class="anchored" data-anchor-id="admm-dual-methods">ADMM (Dual methods)</h3>
+<ol type="1">
+<li><p><strong>Low‑Rank Matrix Completion via ADMM</strong> &nbsp;[25&nbsp;points]</p>
+<p><strong>Background.</strong>&nbsp;In many applications such as recommender systems, computer vision and system identification, the data matrix is approximately low‑rank but only a subset of its entries are observed. Recovering the missing entries can be posed as a convex program that combines a data‑fitting term with the nuclear norm, a convex surrogate for rank.</p>
+<p>We are given a partially observed matrix <span class="math inline">M \in \mathbb{R}^{m\times n}</span> and the index set of observed entries <span class="math inline">\Omega \subseteq \{1,\dots,m\} \times \{1,\dots,n\}</span>. Define the sampling operator <span class="math inline">P_\Omega : \mathbb{R}^{m\times n}\to\mathbb{R}^{m\times n}</span> by <span class="math inline">(P_\Omega(X))_{ij}= X_{ij}</span> if <span class="math inline">(i,j)\in\Omega</span> and <span class="math inline">0</span> otherwise.</p>
+<p>We consider the optimization problem <span class="math display">
+\min_{X\in\mathbb{R}^{m\times n}}\;\frac12\|P_\Omega(X-M)\|_F^2\; + \;\lambda\|X\|_*,
+</span> where <span class="math inline">\|X\|_* = \sum_k \sigma_k(X)</span> is the nuclear norm.</p>
+<ul>
+<li><p><strong>(a)&nbsp;[10&nbsp;points] Derive a two‑block ADMM algorithm.</strong><br>
+Introduce an auxiliary variable <span class="math inline">Z</span> and rewrite the problem in the form<br>
+<span class="math display">
+\min_{X,Z}\; \frac12\|P_\Omega(Z-M)\|_F^2 + \lambda\|X\|_* \quad\text{s.t. } X-Z = 0.
+</span> Derive explicit closed‑form expressions for each ADMM update:</p>
+<ul>
+<li><strong><span class="math inline">X</span>‑update:</strong> singular‑value soft‑thresholding (SVT);</li>
+<li><strong><span class="math inline">Z</span>‑update:</strong> projection onto the observed entries (keep <span class="math inline">M</span> on <span class="math inline">\Omega</span>, average with <span class="math inline">X</span> elsewhere);</li>
+<li><strong>dual‑variable update.</strong></li>
+</ul>
+<p>State a practical stopping rule based on the primal and dual residuals.</p></li>
+<li><p><strong>(b)&nbsp;[10&nbsp;points] Implement the algorithm on synthetic data.</strong><br>
+Use the following set‑up (in&nbsp;Python):</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">0</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>m, n, r <span class="op">=</span> <span class="dv">50</span>, <span class="dv">40</span>, <span class="dv">3</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>U <span class="op">=</span> np.random.randn(m, r)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>V <span class="op">=</span> np.random.randn(n, r)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>M_star <span class="op">=</span> U <span class="op">@</span> V.T                      <span class="co"># ground‑truth low‑rank matrix</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>mask <span class="op">=</span> np.random.rand(m, n) <span class="op">&lt;</span> <span class="fl">0.3</span>     <span class="co"># 30&nbsp;% observations</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>noise <span class="op">=</span> <span class="fl">0.01</span> <span class="op">*</span> np.random.randn(m, n)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> mask <span class="op">*</span> (M_star <span class="op">+</span> noise)           <span class="co"># observed matrix (zeros elsewhere)</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>lambda_ <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> np.sqrt(<span class="bu">max</span>(m, n))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol type="1">
+<li>Implement the ADMM algorithm derived in&nbsp;part&nbsp;(a).</li>
+<li>Run it from <span class="math inline">X^0 = 0</span> for three penalty parameters <span class="math inline">\rho \in \{0.1, 1, 10\}</span>.</li>
+<li>For each <span class="math inline">\rho</span>:
+<ul>
+<li>plot <strong>(i)</strong>&nbsp;the objective value and <strong>(ii)</strong>&nbsp;the relative reconstruction error <span class="math inline">\frac{\|X^k - M_\star\|_F}{\|M_\star\|_F}</span> versus iteration number;</li>
+<li>report the number of iterations required until <span class="math inline">\max(\|r_{\mathrm p}^k\|_F,\|r_{\mathrm d}^k\|_F) \le 10^{-3}</span>.</li>
+</ul></li>
+</ol></li>
+<li><p><strong>(c)&nbsp;[5&nbsp;points] Discussion.</strong><br>
+Compare the convergence behaviour across the three values of <span class="math inline">\rho</span>. How does <span class="math inline">\rho</span> influence the rate at which the primal and dual residuals decrease? Comment on</p>
+<ul>
+<li>the rank of the iterates (after SVT);</li>
+<li>the trade‑off between data‑fit and nuclear‑norm penalty as <span class="math inline">\lambda</span> varies;</li>
+<li>the quality of the reconstruction once the stopping criterion is met.</li>
+</ul>
+<p>Relate your observations to the theory of ADMM and to the sensitivity of singular‑value thresholding to the choice of <span class="math inline">\rho</span>.</p></li>
+</ul></li>
+</ol>
+</section>
+<section id="continuous-time-methods" class="level3">
+<h3 class="anchored" data-anchor-id="continuous-time-methods">Continuous time methods</h3>
+<ol type="1">
+<li><p><strong>SGD as a splitting scheme and the importance of batches order</strong> [40 points]</p>
+<p><strong>Background: (to be honest you can do the task without reading it)</strong></p>
+<p>The standard Gradient Descent (GD) method for minimizing <span class="math inline">f(x) = \frac{1}{n} \sum_{i=1}^n f_i(x)</span> can be viewed as an Euler discretization of the gradient flow Ordinary Differential Equation (ODE): <span class="math display">
+\frac{d x}{d t} = -\nabla f(x) = -\frac{1}{n} \sum_{i=1}^n \nabla f_i(x)
+</span> Stochastic Gradient Descent (SGD), particularly with cycling through mini-batches without replacement, can be interpreted as a <em>splitting scheme</em> applied to this ODE. In a first-order splitting scheme for <span class="math inline">\frac{dx}{dt} = A x = \sum_{i=1}^m A_i x</span>, we approximate the solution <span class="math inline">x(h)</span> by sequentially applying the flows corresponding to each <span class="math inline">A_i</span>: <span class="math inline">x(h) \approx e^{A_{\sigma(m)} h} \ldots e^{A_{\sigma(1)} h} x_0</span> for some permutation <span class="math inline">\sigma</span>.</p>
+<p>In the <a href="https://arxiv.org/abs/2004.08981">paper</a> authors show that for the linear least squares problem <span class="math inline">f(x) = \frac{1}{2n}\|X x - y\|^2</span>, where <span class="math inline">X</span> is split into <span class="math inline">m</span> row blocks <span class="math inline">X_i</span>, the corresponding ODE involves matrices <span class="math inline">A_i = -\frac{1}{n} X_i^T X_i</span>. If <span class="math inline">X_i^T = Q_i R_i</span> is the QR decomposition (<span class="math inline">Q_i</span> has orthonormal columns), let <span class="math inline">\Pi_i = I - Q_i Q_i^*</span> be the projector onto the null space of <span class="math inline">X_i</span>. The paper presents the following result for the asymptotic global error of the splitting scheme:</p>
+<p><strong>Theorem:</strong> Let <span class="math inline">A_i = -\frac{1}{n} X_i^T X_i</span> for <span class="math inline">i=1,\dots,m</span>. Assume each <span class="math inline">A_i</span> is negative semidefinite and does not have full rank, but their sum <span class="math inline">A = \sum A_i</span> does have full rank. Then, for any permutation <span class="math inline">\sigma</span> of <span class="math inline">\{1, \dots, m\}</span>: <span class="math display">
+\lim_{t \to \infty}\| e^{A_{\sigma(m)}t} \cdots e^{A_{\sigma(1)}t} - e^{At}\| = \left\|\prod_{i=1}^m \Pi_{\sigma(i)}\right\|
+</span></p>
+<p>This error bound depends on the product of projectors <span class="math inline">\Pi_i</span> and thus <em>on the order</em> specified by the permutation <span class="math inline">\sigma</span>. Since one epoch of SGD corresponds to applying the Euler discretization of each local problem <span class="math inline">\frac{dx}{dt} = A_i x</span> sequentially, this suggests that the order in which batches are processed in SGD might affect convergence, especially over many epochs.</p>
+<p><strong>Tasks:</strong></p>
+<ol type="1">
+<li><strong>Investigating the Bound Distribution</strong> [5 points]
+<ul>
+<li>Consider a simple linear least squares problem. <span class="math display">
+\frac{1}{2n}\|X \theta - y\|^2 \to \min_{\theta \in \mathbb{R}^{d}}, X \in \mathbb{R}^{n \times d}, y \in \mathbb{R}^n
+</span> For example, generate a random matrix <span class="math inline">X \in \mathbb{R}^{80 \times 20}</span> and a random vector <span class="math inline">y \in \mathbb{R}^{80}</span>.</li>
+<li>Split <span class="math inline">X</span> into <span class="math inline">m=8</span> batches (row blocks) sequentially <span class="math inline">X_1, \ldots, X_8</span>, where each <span class="math inline">X_i \in \mathbb{R}^{10 \times 20}</span>.</li>
+<li>For each batch <span class="math inline">X_i \in \mathbb{R}^{10 \times 20}</span>, you have to compute the projector matrix <span class="math inline">\Pi_i = I - Q_i Q_i^* \in \mathbb{R}^{20 \times 20}</span>, where <span class="math inline">X_i^T = Q_i R_i</span> is the (thin) QR decomposition of <span class="math inline">X_i^T \in \mathbb{R}^{20 \times 10}</span> (<span class="math inline">Q_i \in \mathbb{R}^{20 \times r_i}, R_i \in \mathbb{R}^{r_i \times 10}</span>, with <span class="math inline">r_i = \text{rank}(X_i) \le 10</span>).</li>
+<li>Calculate the error bound norm <span class="math inline">E(\sigma) = \|\prod_{j=1}^m \Pi_{\sigma(j)}\|_2</span> (where the product is a <span class="math inline">20 \times 20</span> matrix) for <em>all</em> <span class="math inline">m! = 8! = 40320</span> possible permutations <span class="math inline">\sigma</span>. Note, that this quantity is a scalar and depends on the order of batches in multiplication (permutation <span class="math inline">\sigma</span>), i.e.&nbsp;<span class="math inline">\|\Pi_1 \Pi_2\| \neq \|\Pi_2 \Pi_1\|</span>.</li>
+<li>Plot a histogram of the distribution of these scalar <span class="math inline">E(\sigma)</span> values. Does the order seem to matter significantly in this random case?</li>
+</ul></li>
+<li><strong>Maximizing Order Dependence with adversarial dataset construction</strong> [30 points]
+<ul>
+<li>Modify the structure of the matrix <span class="math inline">X</span> (or the way it is split into <span class="math inline">X_i</span>, but you cannot change the number of batches and their size) from Task 1 to create a scenario where the distribution of the error bounds <span class="math inline">E(\sigma)</span> has a significantly larger variance (to be precise, the ratio of the maximum to minimum values for different permutations should be maximized). <em>Hint: Think about how the projectors <span class="math inline">\Pi_i</span> interact. How could you make the product <span class="math inline">\Pi_{\sigma(m)} \cdots \Pi_{\sigma(1)}</span> very different for different orders <span class="math inline">\sigma</span>? Consider cases where the null spaces have specific overlaps or orthogonality properties.</em></li>
+<li>Explain your reasoning for the modification.</li>
+<li>Repeat the calculation and plotting from Task 1 for your modified problem to demonstrate the increased variance in the error bounds. Report the ratio of the maximum to minimum values for different permutations before and after adversarial dataset construction.</li>
+</ul></li>
+<li><strong>Testing SGD Convergence</strong> [5 points]
+<ul>
+<li>Using the adversarial dataset from Task 2, identify two specific permutations: <span class="math inline">\sigma_{\text{low}}</span> with a low error bound <span class="math inline">E(\sigma_{\text{low}})</span> and <span class="math inline">\sigma_{\text{high}}</span> with a high error bound <span class="math inline">E(\sigma_{\text{high}})</span>.</li>
+<li>Implement SGD for the linear least squares problem <span class="math inline">\min_x \frac{1}{2n} \|Xx - y\|^2</span>. Use a fixed, small learning rate (e.g., <span class="math inline">\alpha = 0.01/L</span> where <span class="math inline">L</span> is the Lipschitz constant of the full gradient).</li>
+<li>Run SGD for a sufficient number of epochs (e.g., 50-100), applying the batches <em>deterministically</em> according to the order defined by <span class="math inline">\sigma_{\text{low}}</span> in each epoch. Record the squared error <span class="math inline">\|X x_k - y\|^2</span> at the end of each epoch <span class="math inline">k</span>.</li>
+<li>Repeat the SGD run using the fixed batch order defined by <span class="math inline">\sigma_{\text{high}}</span>.</li>
+<li>Plot the convergence curves (squared error vs.&nbsp;epoch number) for both <span class="math inline">\sigma_{\text{low}}</span> and <span class="math inline">\sigma_{\text{high}}</span> on the same graph.</li>
+<li>Discuss your results. Does the observed convergence speed of SGD correlate with the theoretical asymptotic error bound <span class="math inline">E(\sigma)</span>? Does the order of batches appear to matter more in your modified problem compared to the random one?</li>
+</ul></li>
+</ol></li>
+</ol>
 
 
 </section>
