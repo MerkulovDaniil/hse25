@@ -1004,17 +1004,17 @@ should be made to maximize the profit?
 
 1. **[Randomized Preconditioners for Conjugate Gradient Methods.](https://web.stanford.edu/class/ee364b/364b_exercises.pdf)**  (20 points)
 
-    **Linear least squares**
+    *Linear least squares*
 
-    In this task, we explore the use of some randomization methods for solving overdetermined least-squares problems, focusing on conjugate gradient methods. Let $\hat{A} \in \mathbb{R}^{m \times n}$ be a matrix (we assume that $m \gg n$) and $b \in \mathbb{R}^m$, we aim to minimize
+    In this task, we explore the use of some randomization methods for solving overdetermined least-squares problems, focusing on conjugate gradient methods. Let $\hat{A} \in \mathbb{R}^{m \times n}$ be a matrix (we assume that $m \gg n$) and $\hat{b} \in \mathbb{R}^m$, we aim to minimize
 
     $$
-    f(x) = \frac{1}{2} \|\hat{A}x - b\|^2_2 = \frac{1}{2} \sum_{i=1}^m (\hat{a}_i^T x - b_i)^2,
+    f(x) = \frac{1}{2} \|\hat{A}x - \hat{b}\|^2_2 = \frac{1}{2} \sum_{i=1}^m (\hat{a}_i^T x - \hat{b}_i)^2,
     $$
 
     where the $\hat{a}_i \in \mathbb{R}^n$ denote the rows of $\hat{A}$.
 
-    **Preconditioners**
+    *Preconditioners*
 
     We know, that the convergence bound of the CG applied for the problem depends on the condition number of the matrix. Note, that for the problem above we have the matrix $\hat{A}^T \hat{A}$ and the condition number is squared after this operation ($\kappa (X^T X) =  \kappa^2 \left(X \right)$). That is the reason, why we typically need to use *preconditioners* ([read 12. for more details](https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf)) with CG.
 
@@ -1024,7 +1024,7 @@ should be made to maximize the profit?
     
     The best choice of $M$ is $A^{-1}$, because $\kappa (A^{-1} A) = \kappa (I) = 1$. However, if we know $A^{-1}$, the original problem is already solved, that is why we need to find some trade-off between enhanced convergence, and extra cost of working with $M$. The goal is to find $M$ that is cheap to multiply, and approximate inverse of $A$ (or at least has a more clustered spectrum than $A$). 
 
-    Note, that for the linear least squares problem the matrix of quadratic form is $A = \hat{A}^T\hat{A}$. Below you can find Vanilla CG algorithm (on the left) and preconditioned CG algorithm (on the right):
+    Note, that for the linear least squares problem the matrix of quadratic form is $A = \hat{A}^T\hat{A} \in \mathbb{R}^{n \times n}$ and the rhs vector is $b = \hat{A}^T\hat{b} \in \mathbb{R}^n$. Below you can find Vanilla CG algorithm (on the left) and preconditioned CG algorithm (on the right):
 
     $$
     \begin{aligned}
@@ -1046,7 +1046,7 @@ should be made to maximize the profit?
     \begin{aligned}
     & \mathbf{r}_0 := \mathbf{b} - \mathbf{A x}_0 \\
     & \text{if } \mathbf{r}_0 \text{ is sufficiently small, then return } \mathbf{x}_0 \text{ as the result} \\
-    & \mathbf{z}_0 := \mathbf{M}^{-1} \mathbf{r}_0 \\
+    & \mathbf{z}_0 := \mathbf{M} \mathbf{r}_0 \\
     & \mathbf{d}_0 := \mathbf{z}_0 \\
     & k := 0 \\
     & \text{repeat} \\
@@ -1054,7 +1054,7 @@ should be made to maximize the profit?
     & \qquad \mathbf{x}_{k+1} := \mathbf{x}_k + \alpha_k \mathbf{d}_k \\
     & \qquad \mathbf{r}_{k+1} := \mathbf{r}_k - \alpha_k \mathbf{A d}_k \\
     & \qquad \text{if } \mathbf{r}_{k+1} \text{ is sufficiently small, then exit loop} \\
-    & \qquad \mathbf{z}_{k+1} := \mathbf{M}^{-1} \mathbf{r}_{k+1} \\
+    & \qquad \mathbf{z}_{k+1} := \mathbf{M} \mathbf{r}_{k+1} \\
     & \qquad \beta_k := \frac{\mathbf{r}_{k+1}^\mathsf{T} \mathbf{z}_{k+1}}{\mathbf{r}_k^\mathsf{T} \mathbf{z}_k} \\
     & \qquad \mathbf{d}_{k+1} := \mathbf{z}_{k+1} + \beta_k \mathbf{d}_k \\
     & \qquad k := k + 1 \\
@@ -1063,7 +1063,7 @@ should be made to maximize the profit?
     \end{aligned}
     $$
 
-    **Hadamard matrix**
+    *Hadamard matrix*
 
     Given $m \in \{2^i, i = 1, 2, \ldots\}$, the (unnormalized) Hadamard matrix of order $m$ is defined recursively as
 
@@ -1111,20 +1111,20 @@ should be made to maximize the profit?
     
     1. **(10 points)** Implement the conjugate gradient algorithm for solving the positive definite linear system $\hat{A}^T \hat{A} x = \hat{A}^T b$ both with and without the preconditioner $M$. To generate data for your problem, set $m = 2^{12}$ and $n = 400$, then generate the matrix $A$ and the vector $b$. For simplicity in implementation, you may directly pass $\hat{A}^T \hat{A}$ and $\hat{A}^T b$ into your conjugate gradient solver, as we only wish to explore how the methods work.
 
-        ```python
-        import numpy as np
-        from scipy.sparse import diags
+    ```python
+    import numpy as np
+    from scipy.sparse import diags
 
-        m = 2**12  # 4096
-        n = 400
-        # Create a linear space of values from 0.001 to 100
-        values = np.linspace(0.001, 100, n)
-        # Generate the matrix A
-        A = np.random.randn(m, n) * diags(values).toarray()
-        b = np.random.randn(m, 1)
-        ```
+    m = 2**12  # 4096
+    n = 400
+    # Create a linear space of values from 0.001 to 100
+    values = np.linspace(0.001, 100, n)
+    # Generate the matrix A
+    A = np.random.randn(m, n) * diags(values).toarray()
+    b = np.random.randn(m, 1)
+    ```
 
-        Plot the norm of the residual $r_k = \hat{A}^T b - \hat{A}^T \hat{A} x_k$ (relative to $\|\hat{A}^T b\|_2$) as a function of iteration $k$ for each of your conjugate gradient procedures. Additionally, compute and print the condition numbers $\kappa(\hat{A}^T \hat{A})$ and $\kappa(M^{1/2} \hat{A}^T \hat{A} M^{1/2})$.
+    Plot the norm of the residual $r_k = \hat{A}^T b - \hat{A}^T \hat{A} x_k$ (relative to $\|\hat{A}^T b\|_2$) as a function of iteration $k$ for each of your conjugate gradient procedures. Additionally, compute and print the condition numbers $\kappa(\hat{A}^T \hat{A})$ and $\kappa(M^{1/2} \hat{A}^T \hat{A} M^{1/2})$.
 
 ### Newton and quasinewton methods
 
@@ -1270,19 +1270,139 @@ should be made to maximize the profit?
 
 ### Conditional gradient methods
 
+1.  **Projection onto the Birkhoff Polytope using Frank-Wolfe** [20 points]
+
+    In a recent [book](https://arxiv.org/pdf/2211.14103) authors presented the following comparison table with complexities of linear minimizations and projections on some convex sets up to an additive error $\epsilon$ in the Euclidean norm. When $\epsilon$ is missing, there is no additive error. The $\tilde{\mathcal{O}}$ hides polylogarithmic factors in the dimensions and polynomial factors in constants related to thedistancetothe optimum. For the nuclear norm ball, i.e., the spectrahedron, $\nu$ denotes the number of non-zero entries and $\sigma_1$ denotes the top singular value of the projected matrix.
+
+    | **Set**   | **Linear minimization**  | **Projection**    |
+    |------------------------|--------------------|---------|
+    | $n$-dimensional $\ell_p$-ball, $p \neq 1,2,\infty$ | $\mathcal{O}(n)$  | $\tilde{\mathcal{O}}\!\bigl(\tfrac{n}{\epsilon^2}\bigr)$|
+    | Nuclear norm ball of $n\times m$ matrices | $\mathcal{O}\!\Bigl(\nu\,\ln(m + n)\,\tfrac{\sqrt{\sigma_1}}{\sqrt{\epsilon}}\Bigr)$    | $\mathcal{O}\!\bigl(m\,n\,\min\{m,n\}\bigr)$   |
+    | Flow polytope on a graph with $m$ vertices and $n$ edges (capacity bound on edges) | $\mathcal{O}\!\Bigl((n \log m)\bigl(n + m\,\log m\bigr)\Bigr)$ | $\tilde{\mathcal{O}}\!\bigl(\tfrac{n}{\epsilon^2}\bigr)\ \text{or}\ \mathcal{O}(n^4\,\log n)$    |
+    | Birkhoff polytope ($n \times n$ doubly stochastic matrices)   | $\mathcal{O}(n^3)$| $\tilde{\mathcal{O}}\!\bigl(\tfrac{n^2}{\epsilon^2}\bigr)$   |
+
+    The Birkhoff polytope, denoted as $B_n$, is the set of $n \times n$ doubly stochastic matrices:
+    $$
+    B_n = \{ X \in \mathbb{R}^{n \times n} \mid X_{ij} \ge 0 \;\forall i,j, \quad X \mathbf{1} = \mathbf{1}, \quad X^T \mathbf{1} = \mathbf{1} \}
+    $$
+    where $\mathbf{1}$ is the vector of all ones. This set is convex and compact. Its extreme points are the permutation matrices.
+
+    Given an arbitrary matrix $Y \in \mathbb{R}^{n \times n}$, we want to find its projection onto $B_n$, which is the solution to the optimization problem:
+    $$
+    \min_{X \in B_n} f(X) = \frac{1}{2} \| X - Y \|_F^2
+    $$
+    where $\| \cdot \|_F$ is the Frobenius norm.
+
+    We will use the Frank-Wolfe (Conditional Gradient) algorithm to solve this problem. Recall the steps of the Frank-Wolfe algorithm:
+    *   Initialize $X_0 \in B_n$.
+    *   For $k = 0, 1, 2, \ldots$:
+        *   Compute the gradient $\nabla f(X_k)$.
+        *   Solve the Linear Minimization Oracle (LMO): $S_k = \arg\min_{S \in B_n} \langle \nabla f(X_k), S \rangle$.
+        *   Determine the step size $\gamma_k \in [0, 1]$.
+        *   Update $X_{k+1} = (1-\gamma_k) X_k + \gamma_k S_k$.
+
+    **Tasks:**
+
+    1.  [5 points] Explicitly write down the gradient $\nabla f(X_k)$. Explain how to solve the LMO step $\min_{S \in B_n} \langle \nabla f(X_k), S \rangle$. What kind of matrix is the solution $S_k$? *Hint: Consider the connection to the linear assignment problem (Hungarian algorithm).*
+
+    2.  [10 points] Implement the Frank-Wolfe algorithm in Python to solve the projection problem. Use `scipy.optimize.linear_sum_assignment` to solve the LMO. For the step size, you can use the optimal closed-form solution for projection: $\gamma_k = \frac{\langle X_k - Y, X_k - S_k \rangle}{\| X_k - S_k \|_F^2}$, clipped to $[0, 1]$.
+
+        ```python
+        import numpy as np
+        from scipy.optimize import linear_sum_assignment
+        import matplotlib.pyplot as plt
+
+        def project_to_birkhoff_frank_wolfe(Y, max_iter=100, tol=1e-6):
+            """
+            Projects matrix Y onto the Birkhoff polytope using the Frank-Wolfe algorithm.
+
+            Args:
+                Y (np.ndarray): The matrix to project.
+                max_iter (int): Maximum number of iterations.
+                tol (float): Tolerance for convergence (change in objective value).
+
+            Returns:
+                np.ndarray: The projection of Y onto the Birkhoff polytope.
+                list: History of objective function values.
+            """
+            n = Y.shape[0]
+            assert Y.shape[0] == Y.shape[1], "Input matrix must be square"
+
+            # Initialize with a feasible point (e.g., uniform matrix)
+            Xk = np.ones((n, n)) / n
+            
+            objective_history = []
+
+            for k in range(max_iter):
+                # Objective function value
+                obj_val = 0.5 * np.linalg.norm(Xk - Y, 'fro')**2
+                objective_history.append(obj_val)
+                
+                if k > 0 and abs(objective_history[-1] - objective_history[-2]) < tol:
+                    print(f"Converged after {k} iterations.")
+                    break
+
+                # 1. Compute gradient
+                grad_fk = ... # YOUR CODE HERE 
+
+                # 2. Solve the LMO: S_k = argmin_{S in Birkhoff} <grad_fk, S>
+                # Use linear_sum_assignment on the cost matrix grad_fk
+                row_ind, col_ind = ... # YOUR CODE HERE using linear_sum_assignment
+                Sk = np.zeros((n, n))
+                # Construct permutation matrix Sk based on row_ind, col_ind
+                ... # YOUR CODE HERE 
+
+                # 3. Compute step size gamma_k 
+                # Optimal step size for projection, clipped to [0, 1]
+                delta_k = Xk - Sk
+                denom = np.linalg.norm(delta_k, 'fro')**2
+                if denom < 1e-12: # Avoid division by zero if Xk is already the vertex Sk
+                    gamma_k = 0.0
+                else:
+                    gamma_k = ... # YOUR CODE HERE for optimal step size
+                    gamma_k = np.clip(gamma_k, 0.0, 1.0) 
+
+                # 4. Update
+                Xk = ... # YOUR CODE HERE 
+
+            else: # If loop finishes without breaking
+                 print(f"Reached max iterations ({max_iter}).")
+
+            return Xk, objective_history
+        ```
+
+    3.  [5 points] Test your implementation with $n=5$ and a randomly generated matrix $Y = \text{np.random.rand}(5, 5)$. Run the algorithm for 200 iterations. Plot the objective function value $f(X_k)$ versus the iteration number $k$. Verify numerically that the final matrix $X_{200}$ approximately satisfies the conditions for being in $B_5$ (non-negative entries, row sums equal to 1, column sums equal to 1).
+
+1.  **[Minimizing a Quadratic over the Simplex]** [20 points]
+    Consider the problem of minimizing a quadratic function over the standard probability simplex:
+    $$
+    \min_{x \in \Delta_n} f(x) = \frac{1}{2} x^T Q x + c^T x
+    $$
+    where $\Delta_n = \{x \in \mathbb{R}^n \mid \sum_{i=1}^n x_i = 1, x_i \ge 0\}$ is the standard simplex in $\mathbb{R}^n$, $Q \in \mathbb{S}^n_{++}$ is a positive definite matrix, and $c \in \mathbb{R}^n$.
+
+    *   [5 points] Generate the problem data: Choose a dimension $n$ (e.g., $n=20$). Create a random positive definite matrix $Q$ with a given spectrum $[\mu; L]$ and a random vector $x^* \in \Delta_n$, so $c = -Q x^*$ (e.g., with standard normal entries).
+        * Specify and consider $2$ different starting points (you will use them for another algorithm as well)
+        * Calculate $f(x^*)$ and $f(x_0)$, you will have to track $|f(x_k) - f(x^*)|$ for both algorithms
+    *   [7 points] Implement the Frank-Wolfe (Conditional Gradient) algorithm to solve this problem. Do not forget to start from a feasible point. 
+    *   [8 points] Implement the Projected Gradient Descent algorithm.
+        *   Use the same starting points $x_0$. 
+        *   Justify learning rate selection.
+        *   We do not have an explicit formula for Euclidean projection onto the standard simplex. You will need an algorithm for projection onto the standard simplex (e.g., see [Duchi et al., 2008](https://stanford.edu/~jduchi/projects/DuchiShSiCh08.pdf) or use available implementations).
+    *   Plot the objective function value $f(x_k)$ versus the iteration number $k$ for both Frank-Wolfe and Projected Gradient Descent on the same graph. Compare their convergence behavior. Discuss which method appears to converge faster in terms of iterations for this problem.
+
 ### Subgradient method
 
-1. **Finding a point in the intersection of convex sets.** [30 points] Let $A \in \mathbb{R}^{n \times n}$ be a positive definite matrix and let $\Sigma$ be an $n \times n$ diagonal matrix with diagonal entries $\sigma_1,...,\sigma_n > 0$, and $y$ a given vector in $\mathbb{R}^n$. Consider the compact convex sets $U = \{x \in \mathbb{R}^n \mid \|A^{1/2}(x-y)\|_2 \leq 1\}$ and $V = \{x \in \mathbb{R}^n \mid \|\Sigma x\|_\infty \leq 1\}$.
+1. **Finding a point in the intersection of convex sets.** [30 points] Let $A \in \mathbb{R}^{n \times n}$ be some non-degenerate matrix and let $\Sigma$ be an $n \times n$ diagonal matrix with diagonal entries $\sigma_1,...,\sigma_n > 0$, and $y$ a given vector in $\mathbb{R}^n$. Consider the compact convex sets $U = \{x \in \mathbb{R}^n \mid \|A(x-y)\|_2 \leq 1\}$ and $V = \{x \in \mathbb{R}^n \mid \|\Sigma x\|_\infty \leq 1\}$.
 
-    * Minimize maximum distance from the current point to the convex sets. 
+    * [10 points] Minimize maximum distance from the current point to the convex sets. 
 
         $$
         \min_{x\in\mathbb{R}^n} f(x) =  \min_{x\in\mathbb{R}^n} \max\{\mathbf{dist}(x, U), \mathbf{dist}(x, V)\}
         $$
 
-        propose an algorithm to find a point $x \in U \cap V$. You can assume that $U \cap V$ is not empty. Your algorithm must be provably converging (although you do not need to prove it and you can simply refer to the lecture slides).
+        propose an algorithm to find a point $x \in U \cap V$. You can assume that $U \cap V$ is not empty. Your algorithm must be specific and provably converging (although you do not need to prove it and you can simply refer to the lecture slides).
 
-    * Implement your algorithm with the following data: $n = 2$, $y = (3, 2)$, $\sigma_1 = 0.5$, $\sigma_2 = 1$, 
+    * [15 points] Implement your algorithm with the following data: $n = 2$, $y = (3, 2)$, $\sigma_1 = 0.5$, $\sigma_2 = 1$, 
 
         $$
         A = \begin{bmatrix} 
@@ -1291,9 +1411,48 @@ should be made to maximize the profit?
         \end{bmatrix},
         $$
 
-        and $x = (2, 1)$. Plot the objective value of your optimization problem versus the number of iterations.
+        Plot the objective value of your optimization problem versus the number of iterations. Choose the following initial points $x_0 = [(2, -1), (0, 0), (1, 2)]$. 
+
+    * [5 points] Discussion: compare the three curves. Describe the properties of this optimization problem. 
+    
+        * Is it convex/strongly convex? 
+        * Is it smooth? 
+        * Do we have a unique solution here? 
+        * Which start converges fastest / slowest and why? Relate your observations to the initial distance to $U \cap V$ and to the contact angle between the two sets at the solution.
 
     ![Illustration of the problem](convex_intersection.png)
+
+1. **Subgradient methods for Lasso.**  (10 points)
+
+    Consider the optimization problem 
+
+    $$
+    \min_{x \in \mathbb{R}^n} f(x) := \frac12 \|Ax - b\|^2 + \lambda \|x\|_1,
+    $$
+
+    with variables $x \in \mathbb{R}^n$ and problem data $A \in \mathbb{R}^{m \times n}$, $b \in \mathbb{R}^m$ and $\lambda > 0$. This model is known as Lasso, or Least Squares with $l_1$ regularization, which encourages sparsity in the solution via the non-smooth penalty $\|x\|_1 := \sum_{j=1}^n |x_j|$. In this problem, we will explore various subgradient methods for fitting this model.
+
+    * Derive the subdifferential $\partial f(x)$ of the objective.
+
+    * Find the update rule of the subgradient method and state the computational complexity of applying one update using big O notation in terms of the dimensions.
+
+    * Let $n = 1000$, $m = 200$ and $\lambda = 0.01$. Generate a random matrix $A \in \mathbb{R}^{m \times n}$ with independent Gaussian entries with mean 0 and variance $1/m$, and a fixed vector $x^* = {\underbrace{[1, \ldots, 1}_{\text{k times}}, \underbrace{0, \ldots, 0]}_{\text{n-k times}}}^T \in \mathbb{R}^n$. Let $k = 5$ and then set $b = Ax^*$. Implement the subgradient method to minimize $f(x)$, initialized at the all-zeros vector. Try different step size rules, including:
+        * constant step size $\alpha_k = \alpha$
+        * constant step length $\alpha_k = \frac{\gamma}{\|g_k\|_2}$ (so $\|x^{k+1} - x^k\|_2 = \gamma$)
+        * Inverse square root $\frac{1}{\sqrt{k}}$
+        * Inverse $\frac1k$
+        * Polyak's step length with estimated objective value:
+
+            $$
+            \alpha_k = \frac{f(x_k) - f_k^{\text{best}} + \gamma_k}{\|g_k\|_2^2}, \quad \text{ with} \sum_{k=1}^\infty \gamma_k = \infty, \quad \sum_{k=1}^\infty \gamma_k^2 < \infty
+            $$
+
+            For example, one can use $\gamma_k = \frac{10}{10 + k}$. Here  $f_k^{\text{best}} - \gamma_k$ serves as estimate of $f^*$. It is better to take $\gamma_k$ in the same scale as the objective value. One can show, that $f_k^{\text{best}} \to f^*$.
+
+    
+        Plot objective value versus iteration curves of different step size rules on the same figure.
+
+    * Repeat previous part using a heavy ball term, $\beta_k(x^k - x^{k-1})$, added to the subgradient. Try different step size rules as in the previous part and tune the heavy ball parameter $\beta_k = \beta$ for faster convergence.
 
 ### Proximal gradient method
 
@@ -1345,6 +1504,331 @@ should be made to maximize the profit?
 
 ### Stochastic gradient methods
 
+1. **Variance reduction for stochastic gradient methods**. [20 points]
+
+    [5 points]Open [\faPython colab notebook](https://colab.research.google.com/github/MerkulovDaniil/optim/blob/master/assets/Notebooks/VR_exercise.ipynb). Implement SAG and SVRG method. Consider Linear least squares problem with the following setup
+
+    ```python
+    params = {
+        "mu": 0,
+        "m": 50,
+        "n": 100,
+        "methods": [
+            {
+                "method": "SGD",
+                "learning_rate": 1e-2,
+                "batch_size": 2,
+                "iterations": 1000,
+            },
+            {
+                "method": "SGD",
+                "learning_rate": 1e-2,
+                "batch_size": 50,
+                "iterations": 1000,
+            },
+            {
+                "method": "SAG",
+                "learning_rate": 1e-2,
+                "batch_size": 2,
+                "iterations": 1000,
+            },
+            {
+                "method": "SVRG",
+                "learning_rate": 1e-2,
+                "epoch_length": 2,
+                "batch_size": 2,
+                "iterations": 1000,
+            },
+        ]
+    }
+
+    results = run_experiments(params)
+    ```
+
+    [5 points] Then, consider strongly convex case with:
+
+    ```python
+    params = {
+        "mu": 1e-1,
+        "m": 50,
+        "n": 100,
+        "methods": [
+            {
+                "method": "SGD",
+                "learning_rate": 1e-2,
+                "batch_size": 2,
+                "iterations": 2000,
+            },
+            {
+                "method": "SGD",
+                "learning_rate": 1e-2,
+                "batch_size": 50,
+                "iterations": 2000,
+            },
+            {
+                "method": "SAG",
+                "learning_rate": 1e-2,
+                "batch_size": 2,
+                "iterations": 2000,
+            },
+            {
+                "method": "SVRG",
+                "learning_rate": 1e-2,
+                "epoch_length": 2,
+                "batch_size": 2,
+                "iterations": 2000,
+            },
+        ]
+    }
+    ```
+
+    [5 points] And for the convex binary logistic regression:
+
+    ```python
+    params = {
+        "mu": 0,
+        "m": 100,
+        "n": 200,
+        "methods": [
+            {
+                "method": "SGD",
+                "learning_rate": 1e-2,
+                "batch_size": 2,
+                "iterations": 2000,
+            },
+            {
+                "method": "SAG",
+                "learning_rate": 1e-2,
+                "batch_size": 2,
+                "iterations": 2000,
+            },
+            {
+                "method": "SVRG",
+                "learning_rate": 1e-2,
+                "epoch_length": 3,
+                "batch_size": 2,
+                "iterations": 2000,
+            },
+            {
+                "method": "SGD",
+                "learning_rate": 1e-2,
+                "batch_size": 100,
+                "iterations": 2000,
+            },
+        ]
+    }
+    ```
+
+    [5 points] and strongly convex case
+
+    ```python
+    params = {
+        "mu": 1e-1,
+        "m": 100,
+        "n": 200,
+        "methods": [
+            {
+                "method": "SGD",
+                "learning_rate": 2e-2,
+                "batch_size": 2,
+                "iterations": 3000,
+            },
+            {
+                "method": "SAG",
+                "learning_rate": 2e-2,
+                "batch_size": 2,
+                "iterations": 3000,
+            },
+            {
+                "method": "SVRG",
+                "learning_rate": 2e-2,
+                "epoch_length": 3,
+                "batch_size": 2,
+                "iterations": 3000,
+            },
+            {
+                "method": "SGD",
+                "learning_rate": 2e-2,
+                "batch_size": 100,
+                "iterations": 3000,
+            },
+        ]
+    }
+    ```
+
+    Describe the obtained convergence and compare methods.
+
+
+    ![](lls_VR.svg)
+
+    ![](logreg_VR.svg)
+
 ### Neural network training
 
+1. **Anomaly detection with neural network.** [20 points] 
+
+    In this problem we will try to detect anomalies in time series with neural network. 
+
+:::{.plotly} 
+anomaly_detection.html
+:::
+
+    We will train the model to reconstruct normal data and when the reconstruction error for the actual data on trained model is high, we report an anomaly. Start with this notebook [\faPython colab notebook](https://colab.research.google.com/github/MerkulovDaniil/optim/blob/master/assets/Notebooks/time_series_anomaly.ipynb). The default solution is adam and after training it can detect 4 out of 5 anomalies. Train and compare several methods on the same problem. For each method try to find hyperparameters, which ensures at least 3 out of 5 anomalies detection. Present learning curves and anomaly predictions for each method.
+
+    * SGD with momentum [5 points] from optax
+    * Adadelta [5 points] from optax
+    * BFGS [10 points] implemented manually
+    * [Muon](https://github.com/KellerJordan/Muon) [optimizer](https://arxiv.org/pdf/2502.16982) [10 points] implemented manually
+
 ### Big models
+
+1. **Fit the largest model you can on a single GPU.** [15 points]
+
+    In this assignment, you will train a language model (LM) using the TinyStories dataset, focusing on optimizing model performance within the constraints of Google Colab's hardware. For the sake of speed, we will do it on the part of the dataset.
+    
+    ```Tiny_Stories
+    Once upon a time, there was a little car named Beep. Beep loved to go fast and play in the sun. 
+    Beep was a healthy car because he always had good fuel....
+    ```
+
+    Your objective is to maximize the size of the model without exceeding the available computational resources (~ 16GB VRAM). You could start with the Hugging Face Transformers library and experiment with various memory optimization techniques, such as (but not limited to):
+
+        * Different batch size
+        * Different optimizer
+        * Gradient accumulation
+        * Activation checkpointing
+        * CPU offloading
+        * 8bit optimizers
+
+    You have a baseline of training `gpt-2` model prepared at the following [\faPython colab notebook](https://colab.research.google.com/github/MerkulovDaniil/optim/blob/master/assets/Notebooks/TinyStories_baseline.ipynb). You can easily switch it to `opt-350m`, `opt-1.3b`, `gpt2` etc. You can find a great beginner-level guide on the topic [here](https://huggingface.co/docs/transformers/v4.18.0/en/performance).
+
+    ```GPT2
+    A long time ago in a galaxy far far away... a little girl named Lily was playing in the garden. She was so excited! She wanted to explore the garden and see what was around her.
+    Suddenly, she heard a loud noise. Lily looked up and saw a big, hairy creature. Lily was so excited! She ran to the creature and grabbed it by the arm. The creature was so big and hairy that Lily couldn't help but laugh. 
+    ```
+
+    ![](gpt2_generation.jpeg)
+
+    You have to fill this table with your description/observations.
+
+    | Setup | # of parameters | GPU peak memory, MB | Final eval loss | Batch Size | Time to run 5 epochs, s | Generation example | Comment |
+    |:---:|:---:|:---:|:---:|:---:|:---:|:---------:|:---------:|
+    | Baseline (OPT-125M) | 125 M | 9044 | 1.928 | 8 | 442.34 | `A long time ago in a galaxy far far away... there was a little girl named Lily. She was three years old and loved to explore. One day, she decided to go for a walk in the park. Lily was so excited to go for a walk. She asked her mom, "What do you want to do?" Her mom smiled and said, "I want to explore the galaxy." Lily was so excited to explore the galaxy.` |  |
+    | Baseline (GPT2-S) | 124 M | 13016 | 2.001 | 8 | 487.75 | `A long time ago in a galaxy far far away... a little girl named Lily was playing in the garden. She was so excited! She wanted to explore the garden and see what was around her. Suddenly, she heard a loud noise. Lily looked up and saw a big, hairy creature. Lily was so excited! She ran to the creature and grabbed it by the arm. The creature was so big and hairy that Lily couldn't help but laugh.` | The generation seems more interesting, despite the fact, that eval loss is higher. |
+    |  |  |  |  |  |  |  |  |
+    |  |  |  |  |  |  |  |  |
+    |  |  |  |  |  |  |  |  |
+    |  |  |  |  |  |  |  |  |
+     
+    For each unique trick for memory optimization, you will get 3 points (maximum 15 points). A combination of tricks is not counted as a unique trick, but will, probably, be necessary to train big models. The maximum grade is bounded with the size of the trained model:
+        * If the model size you train is <= 125M - you can get a maximum of 6 points.
+        * If the model size you train is 126M <= 350M - you can get a maximum of 8 points.
+        * If the model size you train is 350M <= 1B - you can get a maximum of 12 points.
+        * If you fit 1B model or more - you can get a maximum 15 points.
+
+### ADMM (Dual methods)
+
+1. **Low‑Rank Matrix Completion via ADMM**  [25 points]
+
+   **Background.** In many applications such as recommender systems, computer vision and system identification, the data matrix is approximately low‑rank but only a subset of its entries are observed. Recovering the missing entries can be posed as a convex program that combines a data‑fitting term with the nuclear norm, a convex surrogate for rank.
+
+   We are given a partially observed matrix $M \in \mathbb{R}^{m\times n}$ and the index set of observed entries $\Omega \subseteq \{1,\dots,m\} \times \{1,\dots,n\}$. Define the sampling operator $P_\Omega : \mathbb{R}^{m\times n}\to\mathbb{R}^{m\times n}$ by $(P_\Omega(X))_{ij}= X_{ij}$ if $(i,j)\in\Omega$ and $0$ otherwise.
+
+   We consider the optimization problem
+   $$
+   \min_{X\in\mathbb{R}^{m\times n}}\;\frac12\|P_\Omega(X-M)\|_F^2\; + \;\lambda\|X\|_*,
+   $$
+   where $\|X\|_* = \sum_k \sigma_k(X)$ is the nuclear norm.
+
+   * **(a) [10 points] Derive a two‑block ADMM algorithm.**  
+     Introduce an auxiliary variable $Z$ and rewrite the problem in the form  
+     $$
+     \min_{X,Z}\; \frac12\|P_\Omega(Z-M)\|_F^2 + \lambda\|X\|_* \quad\text{s.t. } X-Z = 0.
+     $$
+     Derive explicit closed‑form expressions for each ADMM update:
+
+     * **$X$‑update:** singular‑value soft‑thresholding (SVT);
+     * **$Z$‑update:** projection onto the observed entries (keep $M$ on $\Omega$, average with $X$ elsewhere);
+     * **dual‑variable update.**
+
+     State a practical stopping rule based on the primal and dual residuals.
+
+   * **(b) [10 points] Implement the algorithm on synthetic data.**  
+     Use the following set‑up (in Python):
+
+     ```python
+     import numpy as np
+     np.random.seed(0)
+     m, n, r = 50, 40, 3
+     U = np.random.randn(m, r)
+     V = np.random.randn(n, r)
+     M_star = U @ V.T                      # ground‑truth low‑rank matrix
+     mask = np.random.rand(m, n) < 0.3     # 30 % observations
+     noise = 0.01 * np.random.randn(m, n)
+     M = mask * (M_star + noise)           # observed matrix (zeros elsewhere)
+     lambda_ = 1 / np.sqrt(max(m, n))
+     ```
+
+     1. Implement the ADMM algorithm derived in part (a).
+     2. Run it from $X^0 = 0$ for three penalty parameters $\rho \in \{0.1, 1, 10\}$.
+     3. For each $\rho$:
+        * plot **(i)** the objective value and **(ii)** the relative reconstruction error $\frac{\|X^k - M_\star\|_F}{\|M_\star\|_F}$ versus iteration number;
+        * report the number of iterations required until $\max(\|r_{\mathrm p}^k\|_F,\|r_{\mathrm d}^k\|_F) \le 10^{-3}$.
+
+   * **(c) [5 points] Discussion.**  
+     Compare the convergence behaviour across the three values of $\rho$. How does $\rho$ influence the rate at which the primal and dual residuals decrease? Comment on
+
+     * the rank of the iterates (after SVT);
+     * the trade‑off between data‑fit and nuclear‑norm penalty as $\lambda$ varies;
+     * the quality of the reconstruction once the stopping criterion is met.
+
+     Relate your observations to the theory of ADMM and to the sensitivity of singular‑value thresholding to the choice of $\rho$.  
+
+
+
+### Continuous time methods
+
+1.  **SGD as a splitting scheme and the importance of batches order** [40 points]
+
+    **Background: (to be honest you can do the task without reading it)**
+
+    The standard Gradient Descent (GD) method for minimizing $f(x) = \frac{1}{n} \sum_{i=1}^n f_i(x)$ can be viewed as an Euler discretization of the gradient flow Ordinary Differential Equation (ODE):
+    $$
+    \frac{d x}{d t} = -\nabla f(x) = -\frac{1}{n} \sum_{i=1}^n \nabla f_i(x)
+    $$
+    Stochastic Gradient Descent (SGD), particularly with cycling through mini-batches without replacement, can be interpreted as a *splitting scheme* applied to this ODE. In a first-order splitting scheme for $\frac{dx}{dt} = A x = \sum_{i=1}^m A_i x$, we approximate the solution $x(h)$ by sequentially applying the flows corresponding to each $A_i$: $x(h) \approx e^{A_{\sigma(m)} h} \ldots e^{A_{\sigma(1)} h} x_0$ for some permutation $\sigma$. 
+    
+    In the [paper](https://arxiv.org/abs/2004.08981) authors show that for the linear least squares problem $f(x) = \frac{1}{2n}\|X x - y\|^2$, where $X$ is split into $m$ row blocks $X_i$, the corresponding ODE involves matrices $A_i = -\frac{1}{n} X_i^T X_i$. If $X_i^T = Q_i R_i$ is the QR decomposition ($Q_i$ has orthonormal columns), let $\Pi_i = I - Q_i Q_i^*$ be the projector onto the null space of $X_i$. The paper presents the following result for the asymptotic global error of the splitting scheme:
+    
+    **Theorem:** Let $A_i = -\frac{1}{n} X_i^T X_i$ for $i=1,\dots,m$. Assume each $A_i$ is negative semidefinite and does not have full rank, but their sum $A = \sum A_i$ does have full rank. Then, for any permutation $\sigma$ of $\{1, \dots, m\}$:
+    $$
+    \lim_{t \to \infty}\| e^{A_{\sigma(m)}t} \cdots e^{A_{\sigma(1)}t} - e^{At}\| = \left\|\prod_{i=1}^m \Pi_{\sigma(i)}\right\|
+    $$
+
+    This error bound depends on the product of projectors $\Pi_i$ and thus *on the order* specified by the permutation $\sigma$. Since one epoch of SGD corresponds to applying the Euler discretization of each local problem $\frac{dx}{dt} = A_i x$ sequentially, this suggests that the order in which batches are processed in SGD might affect convergence, especially over many epochs.
+
+    **Tasks:**
+
+    1.  **Investigating the Bound Distribution** [5 points]
+        *   Consider a simple linear least squares problem.
+            $$
+            \frac{1}{2n}\|X \theta - y\|^2 \to \min_{\theta \in \mathbb{R}^{d}}, X \in \mathbb{R}^{n \times d}, y \in \mathbb{R}^n
+            $$
+            For example, generate a random matrix $X \in \mathbb{R}^{80 \times 20}$ and a random vector $y \in \mathbb{R}^{80}$.
+        *   Split $X$ into $m=8$ batches (row blocks) sequentially $X_1, \ldots, X_8$, where each $X_i \in \mathbb{R}^{10 \times 20}$.
+        *   For each batch $X_i \in \mathbb{R}^{10 \times 20}$, you have to compute the projector matrix $\Pi_i = I - Q_i Q_i^* \in \mathbb{R}^{20 \times 20}$, where $X_i^T = Q_i R_i$ is the (thin) QR decomposition of $X_i^T \in \mathbb{R}^{20 \times 10}$ ($Q_i \in \mathbb{R}^{20 \times r_i}, R_i \in \mathbb{R}^{r_i \times 10}$, with $r_i = \text{rank}(X_i) \le 10$).
+        *   Calculate the error bound norm $E(\sigma) = \|\prod_{j=1}^m \Pi_{\sigma(j)}\|_2$ (where the product is a $20 \times 20$ matrix) for *all* $m! = 8! = 40320$ possible permutations $\sigma$. Note, that this quantity is a scalar and depends on the order of batches in multiplication (permutation $\sigma$), i.e. $\|\Pi_1 \Pi_2\| \neq \|\Pi_2 \Pi_1\|$.
+        *   Plot a histogram of the distribution of these scalar $E(\sigma)$ values. Does the order seem to matter significantly in this random case?
+
+    2.  **Maximizing Order Dependence with adversarial dataset construction** [30 points]
+        *   Modify the structure of the matrix $X$ (or the way it is split into $X_i$, but you cannot change the number of batches and their size) from Task 1 to create a scenario where the distribution of the error bounds $E(\sigma)$ has a significantly larger variance (to be precise, the ratio of the maximum to minimum values for different permutations should be maximized). *Hint: Think about how the projectors $\Pi_i$ interact. How could you make the product $\Pi_{\sigma(m)} \cdots \Pi_{\sigma(1)}$ very different for different orders $\sigma$? Consider cases where the null spaces have specific overlaps or orthogonality properties.*
+        *   Explain your reasoning for the modification.
+        *   Repeat the calculation and plotting from Task 1 for your modified problem to demonstrate the increased variance in the error bounds. Report the ratio of the maximum to minimum values for different permutations before and after adversarial dataset construction.
+
+    3.  **Testing SGD Convergence** [5 points]
+        *   Using the adversarial dataset from Task 2, identify two specific permutations: $\sigma_{\text{low}}$ with a low error bound $E(\sigma_{\text{low}})$ and $\sigma_{\text{high}}$ with a high error bound $E(\sigma_{\text{high}})$.
+        *   Implement SGD for the linear least squares problem $\min_x \frac{1}{2n} \|Xx - y\|^2$. Use a fixed, small learning rate (e.g., $\alpha = 0.01/L$ where $L$ is the Lipschitz constant of the full gradient).
+        *   Run SGD for a sufficient number of epochs (e.g., 50-100), applying the batches *deterministically* according to the order defined by $\sigma_{\text{low}}$ in each epoch. Record the squared error $\|X x_k - y\|^2$ at the end of each epoch $k$.
+        *   Repeat the SGD run using the fixed batch order defined by $\sigma_{\text{high}}$.
+        *   Plot the convergence curves (squared error vs. epoch number) for both $\sigma_{\text{low}}$ and $\sigma_{\text{high}}$ on the same graph.
+        *   Discuss your results. Does the observed convergence speed of SGD correlate with the theoretical asymptotic error bound $E(\sigma)$? Does the order of batches appear to matter more in your modified problem compared to the random one?
