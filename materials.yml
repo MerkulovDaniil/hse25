@@ -1,4 +1,4 @@
-- title: Вспоминаем линейную алгебру. Некоторые матричные разложения. Скорость сходимости. 
+gf- title: Вспоминаем линейную алгебру. Некоторые матричные разложения. Скорость сходимости. 
   number: 1
   materials: /lectures/1.pdf
   notes: /notes/1.pdf
@@ -107,7 +107,7 @@
   materials: /lectures/14.pdf
   notes: /notes/14.pdf
   seminar: /seminars/14.pdf
-  youtube:
+  youtube: https://youtu.be/aBPrz9CHRFs
   download:
 
 - title: "Стохастический градиентный спуск."
@@ -115,16 +115,16 @@
   materials: /lectures/15.pdf
   notes: /notes/15.pdf
   seminar: /seminars/15.pdf
-  youtube:
-  download:
+  youtube: https://youtu.be/Y2_zX8vYP3g
+  download: https://disk.yandex.ru/i/rKWT8YUvy1ghqw
 
 - title: "Методы редукции дисперсии: SAG, SVRG, SAGA. Адаптивные стохастические градиентные методы."
   number: 16
   materials: /lectures/16.pdf
   notes: /notes/16.pdf
   seminar: /seminars/16.pdf
-  youtube:
-  download:
+  youtube: https://youtu.be/vL2573YOKEs
+  download: https://disk.yandex.ru/i/6au4AexzYw9yeQ
 
 - title: "Обучение нейронных сетей с точки зрения методов оптимизации. Обобщающая способность моделей машинного обучения. Double Descent. Grokking. Mode connectivity."
   number: 17
