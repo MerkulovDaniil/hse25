@@ -132,7 +132,7 @@
   notes: /notes/17.pdf
   seminar: /seminars/17.pdf
   youtube: https://youtu.be/VY7T2-Yjq0k
-  download:
+  download: https://disk.360.yandex.ru/i/0wacG9U6Xsl_OA
 
 - title: "Вопросы обучения больших моделей. Lars, Lamb. Learning rate schedulers. Warm-up. MultiGPU training."
   number: 18
@@ -140,7 +140,7 @@
   notes: /notes/18.pdf
   seminar: /seminars/18.pdf
   youtube: https://youtu.be/PKKJaqgOV2U
-  download:
+  download: https://disk.360.yandex.ru/i/CCSrTbjSljh_5A
 
 - title: Введение в двойственные методы оптимизации. Метод двойственного градиентного подъёма. Метод модифицированной функции Лагранжа. ADMM.
   number: 19
