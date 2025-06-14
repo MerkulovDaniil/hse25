@@ -341,7 +341,7 @@ toc: true
 
 1. **Benchmarking Hessian-Vector Product (HVP) Computation in a Neural Network via JAX** [22 points]
 
-    You are given a simple neural network model (an MLP with several hidden layers using a nonlinearity such as GELU). The model’s parameters are defined by the weights of its layers. Your task is to compare different approaches for computing the Hessian-vector product (HVP) with respect to the model’s loss and to study how the computation time scales as the model grows in size.
+    You are given a simple neural network model (an MLP with several hidden layers using a nonlinearity such as GELU). The model's parameters are defined by the weights of its layers. Your task is to compare different approaches for computing the Hessian-vector product (HVP) with respect to the model's loss and to study how the computation time scales as the model grows in size.
 
     **Model and Loss Definition:** [2/22 points] Here is the code for the model and loss definition. Write a method `get_params()` that returns the flattened vector of all model weights.
 
@@ -388,7 +388,7 @@ toc: true
         #hessian_fn =           
         return hessian_fn(params)
     ```
-    that computes the full Hessian $H$ of the loss function with respect to the model parameters using JAX’s automatic differentiation.
+    that computes the full Hessian $H$ of the loss function with respect to the model parameters using JAX's automatic differentiation.
     
     **Naive HVP via Full Hessian:** [2/22 points] Write a function ```naive_hvp(hessian, vector)``` that, given a precomputed Hessian $H$ and a vector $v$ (of the same shape as the parameters), computes the Hessian-vector product using a straightforward matrix-vector multiplication.
 
@@ -417,7 +417,7 @@ toc: true
     
     **Visualization and Analysis:** [12/22 points]
     * Plot the timing results for the three methods on the same graph. For each method, display error bars corresponding to the standard deviation over the runs.
-    * Label the axes clearly (e.g., “Number of Layers” vs. “Computation Time (seconds)”) and include a legend indicating which curve corresponds to which method.
+    * Label the axes clearly (e.g., "Number of Layers" vs. "Computation Time (seconds)") and include a legend indicating which curve corresponds to which method.
     * Analyze the scaling behavior. Try analytically derive the scaling of the methods and compare it with the experimental results.
 
 1. [15 points] We can use automatic differentiation not only to calculate necessary gradients but also for tuning hyperparameters of the algorithm like learning rate in gradient descent (with gradient descent 🤯). Suppose, we have the following function $f(x) = \frac{1}{2}\Vert x\Vert^2$, select a random point $x_0 \in \mathbb{B}^{1000} = \{0 \leq x_i \leq 1 \mid \forall i\}$. Consider $10$ steps of the gradient descent starting from the point $x_0$:
@@ -474,7 +474,7 @@ toc: true
     \sup_{x \in P} f(x) = \max_{i=1, \ldots, k} f(v_i).
     $$
 
-    A stronger statement is: the maximum of a convex function over a closed bounded convex set is achieved at an extreme point, i.e., a point in the set that is not a convex combination of any other points in the set. (you do not have to prove it). *Hint:* Assume the statement is false, and use Jensen’s inequality.
+    A stronger statement is: the maximum of a convex function over a closed bounded convex set is achieved at an extreme point, i.e., a point in the set that is not a convex combination of any other points in the set. (you do not have to prove it). *Hint:* Assume the statement is false, and use Jensen's inequality.
 
 1. [6 points] Show, that the two definitions of $\mu$-strongly convex functions are equivalent:
     1. $f(x)$ is $\mu$-strongly convex $\iff$ for any $x_1, x_2 \in S$ and $0 \le \lambda \le 1$ for some $\mu > 0$:
@@ -662,11 +662,11 @@ In this section, you can consider either the arbitrary norm or the Euclidian nor
     * 🎧 headphones
     * 💻 laptops
 
-    The company’s production facilities are such that if we devote the entire production to headphone covers, we can produce 5000 of them in one day. If we devote the entire production to phone covers or laptop covers, we can produce 4000 or 2000 of them in one day. 
+    The company's production facilities are such that if we devote the entire production to headphone covers, we can produce 5000 of them in one day. If we devote the entire production to phone covers or laptop covers, we can produce 4000 or 2000 of them in one day. 
 
-    The production schedule is one week (6 working days), and the week’s production must be stored before distribution. Storing 1000 headphone covers (packaging included) takes up 30 cubic feet of space. Storing 1000 phone covers (packaging included) takes up 50 cubic feet of space, and storing 1000 laptop covers (packaging included) takes up 200 cubic feet of space. The total storage space available is 1500 cubic feet. 
+    The production schedule is one week (6 working days), and the week's production must be stored before distribution. Storing 1000 headphone covers (packaging included) takes up 30 cubic feet of space. Storing 1000 phone covers (packaging included) takes up 50 cubic feet of space, and storing 1000 laptop covers (packaging included) takes up 200 cubic feet of space. The total storage space available is 1500 cubic feet. 
     
-    Due to commercial agreements with Lyzard Corp has to deliver at least 6000 headphone covers and 4000 laptop covers per week to strengthen the product’s diffusion. 
+    Due to commercial agreements with Lyzard Corp has to deliver at least 6000 headphone covers and 4000 laptop covers per week to strengthen the product's diffusion. 
 
     The marketing department estimates that the weekly demand for headphones covers, phone, and laptop covers does not exceed 15000, 12000 and 8000 units, therefore the company does not want to produce more than these amounts for headphones, phone, and laptop covers. 
 
@@ -1663,15 +1663,228 @@ should be made to maximize the profit?
 
     ![](logreg_VR.svg)
 
+<!-- 1. **Do we need to tune hyperparameters for stochastic gradient methods?** [15 points]
+
+    The performance of stochastic gradient-based optimizers, such as Adam and AdamW, is highly dependent on their hyperparameters. While the learning rate together with the momentum term are often the most tuned parameters, other hyperparameters like the exponential decay rates for the moment estimates, `beta1` and `beta2`, can also have an impact on training dynamics and final model performance. In this problem, you will investigate the sensitivity of Adam and AdamW to these beta parameters when training a small Transformer model.
+
+    Your task is to train a small Transformer on the TinyStories dataset and perform a grid search over `beta1` and `beta2` for both `optax.adam` and `optax.adamw`. You will then visualize the results as heatmaps to analyze the performance landscape of these hyperparameters.
+
+    **Tasks:**
+
+    1.  **[5 points] Implement the basic training loop:**
+        *   Define a small Transformer model. You can use the tutorial [here](https://docs.jaxstack.ai/en/latest/JAX_for_LLM_pretraining.html).
+        *   Load and preprocess a subset of the TinyStories dataset.
+        *   Create a training loop that, for a given set of hyperparameters (`beta1`, `beta2`), trains the model for a fixed number of epochs (e.g., 1).
+        *   For each method find a set of hyperparameters (try the default values) and training length, that satisfies the loss value on the test set to be less than $3.14$.
+
+    2.  **[10 points] Visualize and Analyze:**
+        *   Perform a grid search for `beta1` and `beta2` for both `optax.adam` and `optax.adamw`. Suggested grid:
+            *   `beta1_values = jnp.linspace(0.8, 0.99, 10)`
+            *   `beta2_values = jnp.linspace(0.8, 0.9999, 10)`
+        *   For each pair of (`beta1`, `beta2`), record the final training loss and test loss.
+        *   For each optimizer (Adam and AdamW), create two 2D heatmaps (4 in total):
+            1.  A heatmap showing the final **training loss** for each (`beta1`, `beta2`) pair.
+            2.  A heatmap showing the final **test loss** for each (`beta1`, `beta2`) pair.
+        *   The axes of the heatmaps should correspond to `beta1` and `beta2` values. The color of each cell should represent the loss.
+        *   Analyze the heatmaps. Which hyperparameter settings yield the best performance for each optimizer? Are the optimizers sensitive to changes in `beta1` and `beta2`? Do you observe significant differences between Adam and AdamW in terms of their sensitivity or optimal beta values?
+
+    You can use the following code as a starting point. You can use any other libraries you want, i.e. you are not restricted to JAX. 
+
+    ```python
+    import jax
+    import jax.numpy as jnp
+    import optax
+    import flax.nnx as nnx
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from tqdm.auto import tqdm
+    import requests
+    import tiktoken
+    from sklearn.model_selection import train_test_split
+
+    # --- Model Definition ---
+    def causal_attention_mask(seq_len):
+        return jnp.tril(jnp.ones((seq_len, seq_len)))
+
+    class TransformerBlock(nnx.Module):
+        def __init__(self, embed_dim, num_heads, ff_dim, rngs: nnx.Rngs, rate: float = 0.1):
+            self.mha = nnx.MultiHeadAttention(num_heads=num_heads, in_features=embed_dim, rngs=rngs)
+            self.dropout1 = nnx.Dropout(rate=rate, rngs=rngs)
+            self.layer_norm1 = nnx.LayerNorm(num_features=embed_dim, rngs=rngs)
+            self.linear1 = nnx.Linear(in_features=embed_dim, out_features=ff_dim, rngs=rngs)
+            self.linear2 = nnx.Linear(in_features=ff_dim, out_features=embed_dim, rngs=rngs)
+            self.dropout2 = nnx.Dropout(rate=rate, rngs=rngs)
+            self.layer_norm2 = nnx.LayerNorm(num_features=embed_dim, rngs=rngs)
+
+        def __call__(self, inputs, training: bool = False):
+            mask = causal_attention_mask(inputs.shape[1])
+            attention_output = self.mha(inputs_q=inputs, mask=mask, decode=False)
+            attention_output = self.dropout1(attention_output, deterministic=not training)
+            out1 = self.layer_norm1(inputs + attention_output)
+            ffn_output = self.linear2(nnx.relu(self.linear1(out1)))
+            ffn_output = self.dropout2(ffn_output, deterministic=not training)
+            return self.layer_norm2(out1 + ffn_output)
+
+    class TokenAndPositionEmbedding(nnx.Module):
+        def __init__(self, maxlen, vocab_size, embed_dim, rngs: nnx.Rngs):
+            self.token_emb = nnx.Embed(num_embeddings=vocab_size, features=embed_dim, rngs=rngs)
+            self.pos_emb = nnx.Embed(num_embeddings=maxlen, features=embed_dim, rngs=rngs)
+
+        def __call__(self, x):
+            positions = jnp.arange(0, x.shape[1])[None, :]
+            return self.token_emb(x) + self.pos_emb(positions)
+
+    class MiniGPT(nnx.Module):
+        def __init__(self, maxlen, vocab_size, embed_dim, num_heads, ff_dim, num_blocks, rngs: nnx.Rngs):
+            self.embedding_layer = TokenAndPositionEmbedding(maxlen, vocab_size, embed_dim, rngs=rngs)
+            self.transformer_blocks = [TransformerBlock(embed_dim, num_heads, ff_dim, rngs=rngs) for _ in range(num_blocks)]
+            self.output_layer = nnx.Linear(in_features=embed_dim, out_features=vocab_size, rngs=rngs)
+
+        def __call__(self, inputs, training: bool = False):
+            x = self.embedding_layer(inputs)
+            for block in self.transformer_blocks:
+                x = block(x, training=training)
+            return self.output_layer(x)
+
+    # --- Data Loading ---
+    def load_and_preprocess_data(maxlen, num_samples=5000):
+        url = 'https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/TinyStories-train.txt?download=true'
+        response = requests.get(url)
+        text = response.text
+        stories = text.split('<|endoftext|>')
+        stories = [story.strip() for story in stories if story.strip()]
+        
+        tokenizer = tiktoken.get_encoding("gpt2")
+        
+        # Use a subset of data for speed
+        data = [tokenizer.encode(s, allowed_special={'<|endoftext|>'}) for s in stories[:num_samples]]
+        
+        # Pad sequences
+        padded_data = np.zeros((len(data), maxlen), dtype=int)
+        for i, d in enumerate(data):
+            seq_len = min(len(d), maxlen)
+            padded_data[i, :seq_len] = d[:seq_len]
+
+        train_data, test_data = train_test_split(padded_data, test_size=0.2, random_state=42)
+        return train_data, test_data, tokenizer
+
+    # --- Training and Evaluation ---
+    def loss_fn(model, batch):
+        inputs, targets = batch
+        logits = model(inputs, training=True)
+        loss = optax.softmax_cross_entropy_with_integer_labels(
+            logits=logits, labels=targets).mean()
+        return loss
+
+    @nnx.jit
+    def train_step(model: MiniGPT, optimizer: nnx.Optimizer, batch):
+        grad_fn = nnx.value_and_grad(loss_fn)
+        loss, grads = grad_fn(model, batch)
+        optimizer.update(grads)
+        return loss
+
+    @nnx.jit
+    def eval_step(model: MiniGPT, batch):
+        inputs, targets = batch
+        logits = model(inputs, training=False)
+        return optax.softmax_cross_entropy_with_integer_labels(logits=logits, labels=targets).mean()
+
+    def create_batches(data, batch_size):
+        num_batches = len(data) // batch_size
+        for i in range(num_batches):
+            batch_data = data[i*batch_size:(i+1)*batch_size]
+            inputs = batch_data[:, :-1]
+            targets = batch_data[:, 1:]
+            yield inputs, targets
+    
+    def get_full_ds_loss(model, data, batch_size):
+        losses = []
+        for batch in create_batches(data, batch_size):
+            losses.append(eval_step(model, batch))
+        return jnp.mean(jnp.array(losses))
+
+
+    def train_and_evaluate(optimizer_name, beta1, beta2, num_epochs, model_params, data, batch_size):
+        rngs = nnx.Rngs(0)
+        model = MiniGPT(**model_params, rngs=rngs)
+        
+        if optimizer_name == 'adam':
+            optimizer = nnx.Optimizer(model, optax.adam(learning_rate=1e-3, b1=beta1, b2=beta2))
+        else:
+            optimizer = nnx.Optimizer(model, optax.adamw(learning_rate=1e-3, b1=beta1, b2=beta2))
+        
+        train_data, test_data = data
+
+        for epoch in range(num_epochs):
+            # Simple shuffling
+            key = jax.random.PRNGKey(epoch)
+            perm = jax.random.permutation(key, len(train_data))
+            train_data_shuffled = train_data[perm]
+            
+            for batch in create_batches(train_data_shuffled, batch_size):
+                train_step(model, optimizer, batch)
+
+        final_train_loss = get_full_ds_loss(model, train_data, batch_size)
+        final_test_loss = get_full_ds_loss(model, test_data, batch_size)
+        
+        return final_train_loss, final_test_loss
+
+    def plot_heatmap(data, title, xlabel, ylabel, xticklabels, yticklabels):
+        ### YOUR CODE HERE ###
+        plt.show()
+
+    # --- Main Execution ---
+    if __name__ == '__main__':
+        # Model and training parameters
+        maxlen = 128
+        embed_dim = 128
+        num_heads = 4
+        ff_dim = 128
+        num_blocks = 2
+        num_epochs = 3
+        batch_size = 64
+        
+        train_data, test_data, tokenizer = load_and_preprocess_data(maxlen)
+        vocab_size = tokenizer.n_vocab
+
+        model_params = {
+            "maxlen": maxlen, "vocab_size": vocab_size, "embed_dim": embed_dim,
+            "num_heads": num_heads, "ff_dim": ff_dim, "num_blocks": num_blocks
+        }
+
+        beta1_values = jnp.linspace(0.8, 0.99, 10)
+        beta2_values = jnp.linspace(0.8, 0.9999, 10)
+
+        for optimizer_name in ['adam', 'adamw']:
+            print(f"--- Tuning {optimizer_name.upper()} ---")
+            train_losses = np.zeros((len(beta2_values), len(beta1_values)))
+            test_losses = np.zeros((len(beta2_values), len(beta1_values)))
+
+            for i, beta2 in enumerate(tqdm(beta2_values, desc=f'{optimizer_name} beta2')):
+                for j, beta1 in enumerate(tqdm(beta1_values, desc=f'{optimizer_name} beta1')):
+                    train_loss, test_loss = train_and_evaluate(
+                        optimizer_name, beta1, beta2, num_epochs, 
+                        model_params, (train_data, test_data), batch_size
+                    )
+                    train_losses[i, j] = train_loss
+                    test_losses[i, j] = test_loss
+
+            plot_heatmap(train_losses, f'{optimizer_name.upper()} - Final Train Loss',
+                         'beta1', 'beta2', beta1_values, beta2_values)
+            plot_heatmap(test_losses, f'{optimizer_name.upper()} - Final Test Loss',
+                         'beta1', 'beta2', beta1_values, beta2_values)
+    ``` -->
+
 ### Neural network training
 
-1. **Anomaly detection with neural network.** [20 points] 
+1.  **Anomaly detection with neural network.** [30 points] 
 
     In this problem we will try to detect anomalies in time series with neural network. 
-
-:::{.plotly} 
-anomaly_detection.html
-:::
+    
+    :::{.plotly}
+    anomaly_detection.html
+    :::
 
     We will train the model to reconstruct normal data and when the reconstruction error for the actual data on trained model is high, we report an anomaly. Start with this notebook [\faPython colab notebook](https://colab.research.google.com/github/MerkulovDaniil/optim/blob/master/assets/Notebooks/time_series_anomaly.ipynb). The default solution is adam and after training it can detect 4 out of 5 anomalies. Train and compare several methods on the same problem. For each method try to find hyperparameters, which ensures at least 3 out of 5 anomalies detection. Present learning curves and anomaly predictions for each method.
 
@@ -1693,12 +1906,12 @@ anomaly_detection.html
 
     Your objective is to maximize the size of the model without exceeding the available computational resources (~ 16GB VRAM). You could start with the Hugging Face Transformers library and experiment with various memory optimization techniques, such as (but not limited to):
 
-        * Different batch size
-        * Different optimizer
-        * Gradient accumulation
-        * Activation checkpointing
-        * CPU offloading
-        * 8bit optimizers
+    * Different batch size
+    * Different optimizer
+    * Gradient accumulation
+    * Activation checkpointing
+    * CPU offloading
+    * 8bit optimizers
 
     You have a baseline of training `gpt-2` model prepared at the following [\faPython colab notebook](https://colab.research.google.com/github/MerkulovDaniil/optim/blob/master/assets/Notebooks/TinyStories_baseline.ipynb). You can easily switch it to `opt-350m`, `opt-1.3b`, `gpt2` etc. You can find a great beginner-level guide on the topic [here](https://huggingface.co/docs/transformers/v4.18.0/en/performance).
 
@@ -1721,16 +1934,17 @@ anomaly_detection.html
     |  |  |  |  |  |  |  |  |
      
     For each unique trick for memory optimization, you will get 3 points (maximum 15 points). A combination of tricks is not counted as a unique trick, but will, probably, be necessary to train big models. The maximum grade is bounded with the size of the trained model:
-        * If the model size you train is <= 125M - you can get a maximum of 6 points.
-        * If the model size you train is 126M <= 350M - you can get a maximum of 8 points.
-        * If the model size you train is 350M <= 1B - you can get a maximum of 12 points.
-        * If you fit 1B model or more - you can get a maximum 15 points.
+
+    * If the model size you train is <= 125M - you can get a maximum of 6 points.
+    * If the model size you train is 126M <= 350M - you can get a maximum of 8 points.
+    * If the model size you train is 350M <= 1B - you can get a maximum of 12 points.
+    * If you fit 1B model or more - you can get a maximum 15 points.
 
 ### ADMM (Dual methods)
 
-1. **Low‑Rank Matrix Completion via ADMM**  [25 points]
+1. **Low‑Rank Matrix Completion via ADMM**  [25 points]
 
-   **Background.** In many applications such as recommender systems, computer vision and system identification, the data matrix is approximately low‑rank but only a subset of its entries are observed. Recovering the missing entries can be posed as a convex program that combines a data‑fitting term with the nuclear norm, a convex surrogate for rank.
+   **Background.** In many applications such as recommender systems, computer vision and system identification, the data matrix is approximately low‑rank but only a subset of its entries are observed. Recovering the missing entries can be posed as a convex program that combines a data‑fitting term with the nuclear norm, a convex surrogate for rank.
 
    We are given a partially observed matrix $M \in \mathbb{R}^{m\times n}$ and the index set of observed entries $\Omega \subseteq \{1,\dots,m\} \times \{1,\dots,n\}$. Define the sampling operator $P_\Omega : \mathbb{R}^{m\times n}\to\mathbb{R}^{m\times n}$ by $(P_\Omega(X))_{ij}= X_{ij}$ if $(i,j)\in\Omega$ and $0$ otherwise.
 
@@ -1740,7 +1954,7 @@ anomaly_detection.html
    $$
    where $\|X\|_* = \sum_k \sigma_k(X)$ is the nuclear norm.
 
-   * **(a) [10 points] Derive a two‑block ADMM algorithm.**  
+   * **(a) [10 points] Derive a two‑block ADMM algorithm.**  
      Introduce an auxiliary variable $Z$ and rewrite the problem in the form  
      $$
      \min_{X,Z}\; \frac12\|P_\Omega(Z-M)\|_F^2 + \lambda\|X\|_* \quad\text{s.t. } X-Z = 0.
@@ -1753,8 +1967,8 @@ anomaly_detection.html
 
      State a practical stopping rule based on the primal and dual residuals.
 
-   * **(b) [10 points] Implement the algorithm on synthetic data.**  
-     Use the following set‑up (in Python):
+   * **(b) [10 points] Implement the algorithm on synthetic data.**  
+     Use the following set‑up (in Python):
 
      ```python
      import numpy as np
@@ -1763,19 +1977,19 @@ anomaly_detection.html
      U = np.random.randn(m, r)
      V = np.random.randn(n, r)
      M_star = U @ V.T                      # ground‑truth low‑rank matrix
-     mask = np.random.rand(m, n) < 0.3     # 30 % observations
+     mask = np.random.rand(m, n) < 0.3     # 30 % observations
      noise = 0.01 * np.random.randn(m, n)
      M = mask * (M_star + noise)           # observed matrix (zeros elsewhere)
      lambda_ = 1 / np.sqrt(max(m, n))
      ```
 
-     1. Implement the ADMM algorithm derived in part (a).
+     1. Implement the ADMM algorithm derived in part (a).
      2. Run it from $X^0 = 0$ for three penalty parameters $\rho \in \{0.1, 1, 10\}$.
      3. For each $\rho$:
-        * plot **(i)** the objective value and **(ii)** the relative reconstruction error $\frac{\|X^k - M_\star\|_F}{\|M_\star\|_F}$ versus iteration number;
+        * plot **(i)** the objective value and **(ii)** the relative reconstruction error $\frac{\|X^k - M_\star\|_F}{\|M_\star\|_F}$ versus iteration number;
         * report the number of iterations required until $\max(\|r_{\mathrm p}^k\|_F,\|r_{\mathrm d}^k\|_F) \le 10^{-3}$.
 
-   * **(c) [5 points] Discussion.**  
+   * **(c) [5 points] Discussion.**  
      Compare the convergence behaviour across the three values of $\rho$. How does $\rho$ influence the rate at which the primal and dual residuals decrease? Comment on
 
      * the rank of the iterates (after SVT);
@@ -1786,9 +2000,9 @@ anomaly_detection.html
 
 
 
-### Continuous time methods
+### Bonus: Continuous time methods
 
-1.  **SGD as a splitting scheme and the importance of batches order** [40 points]
+1.  **SGD as a splitting scheme and the importance of batches order** [30 points]
 
     **Background: (to be honest you can do the task without reading it)**
 
@@ -1820,7 +2034,7 @@ anomaly_detection.html
         *   Calculate the error bound norm $E(\sigma) = \|\prod_{j=1}^m \Pi_{\sigma(j)}\|_2$ (where the product is a $20 \times 20$ matrix) for *all* $m! = 8! = 40320$ possible permutations $\sigma$. Note, that this quantity is a scalar and depends on the order of batches in multiplication (permutation $\sigma$), i.e. $\|\Pi_1 \Pi_2\| \neq \|\Pi_2 \Pi_1\|$.
         *   Plot a histogram of the distribution of these scalar $E(\sigma)$ values. Does the order seem to matter significantly in this random case?
 
-    2.  **Maximizing Order Dependence with adversarial dataset construction** [30 points]
+    2.  **Maximizing Order Dependence with adversarial dataset construction** [20 points]
         *   Modify the structure of the matrix $X$ (or the way it is split into $X_i$, but you cannot change the number of batches and their size) from Task 1 to create a scenario where the distribution of the error bounds $E(\sigma)$ has a significantly larger variance (to be precise, the ratio of the maximum to minimum values for different permutations should be maximized). *Hint: Think about how the projectors $\Pi_i$ interact. How could you make the product $\Pi_{\sigma(m)} \cdots \Pi_{\sigma(1)}$ very different for different orders $\sigma$? Consider cases where the null spaces have specific overlaps or orthogonality properties.*
         *   Explain your reasoning for the modification.
         *   Repeat the calculation and plotting from Task 1 for your modified problem to demonstrate the increased variance in the error bounds. Report the ratio of the maximum to minimum values for different permutations before and after adversarial dataset construction.
