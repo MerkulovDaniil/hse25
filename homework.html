@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.7.32">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -72,7 +72,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap-db5381e954ba3bce59660fe51b887b8f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -1563,7 +1563,7 @@ P(y = j | x; W) = \frac{e^{W_j^T x}}{\sum\limits_{i=1}^{c} e^{W_i^T x}}
 <p>We will solve the sparse softmax regression problem using the subgradient method and the proximal gradient method, both incorporating L1 regularization. The proximal gradient method is particularly useful for optimization problems involving non-smooth regularizers like the L1 norm. We will use 3 class classification problem of <a href="https://archive.ics.uci.edu/dataset/697/predict+students+dropout+and+academic+success">Predicting Students’ Dropout and Academic Success</a>. In this problem you should start with this <a href="https://colab.research.google.com/github/MerkulovDaniil/optim/blob/master/assets/Notebooks/Proximal_softmax_regression.ipynb">colab notebook</a></p>
 <ol type="1">
 <li>[4 points] Write down exact formulation of subgradient method and proximal gradient method here (you can not use any optimization problems in this formulation).</li>
-<li>[6 points] Choose <span class="math inline">\lambda = 0</span>. Solve the softmax regression problem using subgradient descent and proximal gradient descent. Find the highest learning (individually), acceptable for both methods to converge. Report convergence curves and report final sparsity of both methods. Draw you conclusions.</li>
+<li>[6 points] Choose <span class="math inline">\lambda = 0</span>. Solve the softmax regression problem using subgradient method and proximal gradient descent. Find the highest learning (individually), acceptable for both methods to converge. Report convergence curves and report final sparsity of both methods. Draw you conclusions.</li>
 <li>[10 points] Solve non-smooth problem and fill the following table. For each value of <span class="math inline">\lambda</span> provide convergence curves.</li>
 </ol>
 <p>Report the number of iterations needed to reach specified primal gaps for each method. Present the results in the following markdown table:</p>
@@ -1592,7 +1592,7 @@ P(y = j | x; W) = \frac{e^{W_j^T x}}{\sum\limits_{i=1}^{c} e^{W_i^T x}}
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: center;">Subgradient Descent</td>
+<td style="text-align: center;">subgradient method</td>
 <td style="text-align: center;"></td>
 <td style="text-align: right;"><span class="math inline">10^{-1}</span></td>
 <td style="text-align: center;"></td>
@@ -1602,7 +1602,7 @@ P(y = j | x; W) = \frac{e^{W_j^T x}}{\sum\limits_{i=1}^{c} e^{W_i^T x}}
 <td style="text-align: center;"></td>
 </tr>
 <tr class="even">
-<td style="text-align: center;">Subgradient Descent</td>
+<td style="text-align: center;">subgradient method</td>
 <td style="text-align: center;"></td>
 <td style="text-align: right;"><span class="math inline">10^{-2}</span></td>
 <td style="text-align: center;"></td>
@@ -1612,7 +1612,7 @@ P(y = j | x; W) = \frac{e^{W_j^T x}}{\sum\limits_{i=1}^{c} e^{W_i^T x}}
 <td style="text-align: center;"></td>
 </tr>
 <tr class="odd">
-<td style="text-align: center;">Subgradient Descent</td>
+<td style="text-align: center;">subgradient method</td>
 <td style="text-align: center;"></td>
 <td style="text-align: right;"><span class="math inline">10^{-3}</span></td>
 <td style="text-align: center;"></td>
@@ -1622,7 +1622,7 @@ P(y = j | x; W) = \frac{e^{W_j^T x}}{\sum\limits_{i=1}^{c} e^{W_i^T x}}
 <td style="text-align: center;"></td>
 </tr>
 <tr class="even">
-<td style="text-align: center;">Subgradient Descent</td>
+<td style="text-align: center;">subgradient method</td>
 <td style="text-align: center;"></td>
 <td style="text-align: right;"><span class="math inline">10^{-4}</span></td>
 <td style="text-align: center;"></td>
@@ -1632,7 +1632,7 @@ P(y = j | x; W) = \frac{e^{W_j^T x}}{\sum\limits_{i=1}^{c} e^{W_i^T x}}
 <td style="text-align: center;"></td>
 </tr>
 <tr class="odd">
-<td style="text-align: center;">Subgradient Descent</td>
+<td style="text-align: center;">subgradient method</td>
 <td style="text-align: center;"></td>
 <td style="text-align: right;"><span class="math inline">10^{-5}</span></td>
 <td style="text-align: center;"></td>
@@ -1692,7 +1692,7 @@ P(y = j | x; W) = \frac{e^{W_j^T x}}{\sum\limits_{i=1}^{c} e^{W_i^T x}}
 <td style="text-align: center;"></td>
 </tr>
 <tr class="odd">
-<td style="text-align: center;">Subgradient Descent</td>
+<td style="text-align: center;">subgradient method</td>
 <td style="text-align: center;"></td>
 <td style="text-align: right;"><span class="math inline">10^{-2}</span></td>
 <td style="text-align: center;"></td>
@@ -1712,7 +1712,7 @@ P(y = j | x; W) = \frac{e^{W_j^T x}}{\sum\limits_{i=1}^{c} e^{W_i^T x}}
 <td style="text-align: center;"></td>
 </tr>
 <tr class="odd">
-<td style="text-align: center;">Subgradient Descent</td>
+<td style="text-align: center;">subgradient method</td>
 <td style="text-align: center;"></td>
 <td style="text-align: right;"><span class="math inline">10^{-2}</span></td>
 <td style="text-align: center;"></td>
@@ -1732,7 +1732,7 @@ P(y = j | x; W) = \frac{e^{W_j^T x}}{\sum\limits_{i=1}^{c} e^{W_i^T x}}
 <td style="text-align: center;"></td>
 </tr>
 <tr class="odd">
-<td style="text-align: center;">Subgradient Descent</td>
+<td style="text-align: center;">subgradient method</td>
 <td style="text-align: center;"></td>
 <td style="text-align: right;"><span class="math inline">10^{-2}</span></td>
 <td style="text-align: center;"></td>
