@@ -1477,28 +1477,28 @@ should be made to maximize the profit?
     We will solve the sparse softmax regression problem using the subgradient method and the proximal gradient method, both incorporating L1 regularization. The proximal gradient method is particularly useful for optimization problems involving non-smooth regularizers like the L1 norm. We will use 3 class classification problem of [Predicting Students' Dropout and Academic Success](https://archive.ics.uci.edu/dataset/697/predict+students+dropout+and+academic+success). In this problem you should start with this [\faPython colab notebook](https://colab.research.google.com/github/MerkulovDaniil/optim/blob/master/assets/Notebooks/Proximal_softmax_regression.ipynb)
 
     1. [4 points] Write down exact formulation of subgradient method and proximal gradient method here (you can not use any optimization problems in this formulation).
-    1. [6 points] Choose $\lambda = 0$. Solve the softmax regression problem using subgradient descent and proximal gradient descent. Find the highest learning (individually), acceptable for both methods to converge. Report convergence curves and report final sparsity of both methods. Draw you conclusions.
+    1. [6 points] Choose $\lambda = 0$. Solve the softmax regression problem using subgradient method and proximal gradient descent. Find the highest learning (individually), acceptable for both methods to converge. Report convergence curves and report final sparsity of both methods. Draw you conclusions.
     1. [10 points] Solve non-smooth problem and fill the following table. For each value of $\lambda$ provide convergence curves.
 
     Report the number of iterations needed to reach specified primal gaps for each method. Present the results in the following markdown table:
 
     | Method                     | Learning Rate ($\eta$)   | Tolerance ($\epsilon$) | Number of Iterations | Comment(if any)          | Final Sparsity of the solution | $\lambda$ | Final test accuracy |
     |:--------------------------:|:------------------------:|-----------------------:|:--------------------:|:------------------------:|:------------------------------:|:----------|:-------------------:|
-    | Subgradient Descent        |                          | $10^{-1}$              |                      |                          |                                |  `1e-2`   |                     |
-    | Subgradient Descent        |                          | $10^{-2}$              |                      |                          |                                |  `1e-2`   |                     |
-    | Subgradient Descent        |                          | $10^{-3}$              |                      |                          |                                |  `1e-2`   |                     |
-    | Subgradient Descent        |                          | $10^{-4}$              |                      |                          |                                |  `1e-2`   |                     |
-    | Subgradient Descent        |                          | $10^{-5}$              |                      |                          |                                |  `1e-2`   |                     |
+    | subgradient method        |                          | $10^{-1}$              |                      |                          |                                |  `1e-2`   |                     |
+    | subgradient method        |                          | $10^{-2}$              |                      |                          |                                |  `1e-2`   |                     |
+    | subgradient method        |                          | $10^{-3}$              |                      |                          |                                |  `1e-2`   |                     |
+    | subgradient method        |                          | $10^{-4}$              |                      |                          |                                |  `1e-2`   |                     |
+    | subgradient method        |                          | $10^{-5}$              |                      |                          |                                |  `1e-2`   |                     |
     | Proximal Gradient Descent  |                          | $10^{-1}$              |                      |                          |                                |  `1e-2`   |                     |
     | Proximal Gradient Descent  |                          | $10^{-2}$              |                      |                          |                                |  `1e-2`   |                     |
     | Proximal Gradient Descent  |                          | $10^{-3}$              |                      |                          |                                |  `1e-2`   |                     |
     | Proximal Gradient Descent  |                          | $10^{-4}$              |                      |                          |                                |  `1e-2`   |                     |
     | Proximal Gradient Descent  |                          | $10^{-5}$              |                      |                          |                                |  `1e-2`   |                     |
-    | Subgradient Descent        |                          | $10^{-2}$              |                      |                          |                                |  `1e-3`   |                     |
+    | subgradient method        |                          | $10^{-2}$              |                      |                          |                                |  `1e-3`   |                     |
     | Proximal Gradient Descent  |                          | $10^{-2}$              |                      |                          |                                |  `1e-3`   |                     |
-    | Subgradient Descent        |                          | $10^{-2}$              |                      |                          |                                |  `1e-1`   |                     |
+    | subgradient method        |                          | $10^{-2}$              |                      |                          |                                |  `1e-1`   |                     |
     | Proximal Gradient Descent  |                          | $10^{-2}$              |                      |                          |                                |  `1e-1`   |                     |
-    | Subgradient Descent        |                          | $10^{-2}$              |                      |                          |                                |  `1`      |                     |
+    | subgradient method        |                          | $10^{-2}$              |                      |                          |                                |  `1`      |                     |
     | Proximal Gradient Descent  |                          | $10^{-2}$              |                      |                          |                                |  `1`      |                     |
 
 
