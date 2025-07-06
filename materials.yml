@@ -35,8 +35,8 @@
   materials: /lectures/5.pdf
   notes: /notes/5.pdf
   seminar: /seminars/5.pdf
-  youtube: https://youtu.be/ibYUeSq-zkQ
-  download: https://disk.yandex.ru/i/y6fIdxfpzjgmxA
+  youtube: https://youtu.be/l-8QRPv9_Sc
+  download:
 
 - title: Двойственность.
   number: 6
@@ -107,40 +107,40 @@
   materials: /lectures/14.pdf
   notes: /notes/14.pdf
   seminar: /seminars/14.pdf
-  youtube:
-  download:
+  youtube: https://youtu.be/aBPrz9CHRFs
+  download: https://disk.yandex.ru/i/an_cDSJXZdh1YQ
 
 - title: "Стохастический градиентный спуск."
   number: 15
   materials: /lectures/15.pdf
   notes: /notes/15.pdf
   seminar: /seminars/15.pdf
-  youtube:
-  download:
+  youtube: https://youtu.be/Y2_zX8vYP3g
+  download: https://disk.yandex.ru/i/rKWT8YUvy1ghqw
 
 - title: "Методы редукции дисперсии: SAG, SVRG, SAGA. Адаптивные стохастические градиентные методы."
   number: 16
   materials: /lectures/16.pdf
   notes: /notes/16.pdf
   seminar: /seminars/16.pdf
-  youtube:
-  download:
+  youtube: https://youtu.be/vL2573YOKEs
+  download: https://disk.yandex.ru/i/6au4AexzYw9yeQ
 
 - title: "Обучение нейронных сетей с точки зрения методов оптимизации. Обобщающая способность моделей машинного обучения. Double Descent. Grokking. Mode connectivity."
   number: 17
   materials: /lectures/17.pdf
   notes: /notes/17.pdf
   seminar: /seminars/17.pdf
-  youtube:
-  download:
+  youtube: https://youtu.be/VY7T2-Yjq0k
+  download: https://disk.360.yandex.ru/i/0wacG9U6Xsl_OA
 
 - title: "Вопросы обучения больших моделей. Lars, Lamb. Learning rate schedulers. Warm-up. MultiGPU training."
   number: 18
   materials: /lectures/18.pdf
   notes: /notes/18.pdf
   seminar: /seminars/18.pdf
-  youtube:
-  download:
+  youtube: https://youtu.be/PKKJaqgOV2U
+  download: https://disk.360.yandex.ru/i/CCSrTbjSljh_5A
 
 - title: Введение в двойственные методы оптимизации. Метод двойственного градиентного подъёма. Метод модифицированной функции Лагранжа. ADMM.
   number: 19
